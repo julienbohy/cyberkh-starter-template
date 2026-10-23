@@ -7,10 +7,41 @@ declare(strict_types=1);
 // the Docker services (DATABASE_URL, MAILER_DSN...).
 define('CASTOR_USE_CHDIR', true);
 
+use Castor\Attribute\AsContext;
 use Castor\Attribute\AsTask;
+use Castor\Context;
+use Symfony\Component\Process\Process;
 
 use function Castor\io;
 use function Castor\run;
+
+#[AsContext(default: true)]
+function default_context(): Context
+{
+    return new Context(environment: docker_host());
+}
+
+/**
+ * The socket of the active Docker context (Docker Desktop, OrbStack, Colima...), unless DOCKER_HOST
+ * is set: the Symfony CLI only looks at the default socket, and without Docker it does not expose
+ * the variables of the services.
+ *
+ * @return array<string, string>
+ */
+function docker_host(): array
+{
+    if (getenv('DOCKER_HOST') !== false) {
+        return [];
+    }
+
+    $process = new Process(['docker', 'context', 'inspect', '--format', '{{.Endpoints.docker.Host}}']);
+    $process->run();
+    $host = trim($process->getOutput());
+
+    return $process->isSuccessful() && $host !== '' ? [
+        'DOCKER_HOST' => $host,
+    ] : [];
+}
 
 #[AsTask(description: 'Install the dependencies and the Git hooks, start the stack and run the migrations')]
 function install(): void

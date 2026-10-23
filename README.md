@@ -41,10 +41,23 @@ log in with `user@example.com` and the password `correct-horse-battery-staple`.
 The web server also runs two workers (`.symfony.local.yaml`): the Messenger consumer, which
 sends the emails, and the Tailwind watcher.
 
-Every command goes through the Symfony CLI: it uses the PHP version of `.php-version` and
-exposes the environment variables of the Docker services (`DATABASE_URL`, `MAILER_DSN`...)
-to the application. If the Symfony CLI does not find the Docker services, check that
-`DOCKER_HOST` points to the socket of your Docker engine.
+Every command goes through the Symfony CLI, which uses the PHP version of `.php-version`.
+
+### Ports
+
+The Docker services listen on fixed ports of `127.0.0.1`, set in `.env` and read by Docker Compose
+too:
+
+| Variable           | Default | Service           |
+|--------------------|---------|-------------------|
+| `DATABASE_PORT`    | `5432`  | PostgreSQL        |
+| `MAILER_SMTP_PORT` | `1025`  | Mailpit (SMTP)    |
+| `MAILER_WEB_PORT`  | `8025`  | Mailpit (web UI)  |
+
+Change them in `.env` when another project already uses them, then run `castor start` again.
+
+The Castor tasks also give the Symfony CLI the socket of the active Docker context (Docker
+Desktop, OrbStack, Colima...), unless `DOCKER_HOST` is set.
 
 ## Daily tasks
 

@@ -1,17 +1,18 @@
-
+# Fixed host ports, so that the URLs of .env work even when the Symfony CLI does not see Docker.
+# Docker Compose reads them from .env: change them there in a project that runs next to another one.
 services:
 ###> doctrine/doctrine-bundle ###
   database:
     ports:
-      - "5432"
+      - "127.0.0.1:${DATABASE_PORT:-5432}:5432"
 ###< doctrine/doctrine-bundle ###
 
 ###> symfony/mailer ###
   mailer:
     image: axllent/mailpit
     ports:
-      - "1025"
-      - "8025"
+      - "127.0.0.1:${MAILER_SMTP_PORT:-1025}:1025"
+      - "127.0.0.1:${MAILER_WEB_PORT:-8025}:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
