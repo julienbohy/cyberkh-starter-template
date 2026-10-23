@@ -6,6 +6,7 @@ use Symplify\EasyCodingStandard\Config\ECSConfig;
 
 return ECSConfig::configure()
     ->withPaths([
+        __DIR__ . '/.castor',
         __DIR__ . '/bin',
         __DIR__ . '/config',
         __DIR__ . '/public',

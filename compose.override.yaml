@@ -1,5 +1,5 @@
 # Fixed host ports, so that the URLs of .env work even when the Symfony CLI does not see Docker.
-# Set in .env, and in .env.local to change them: `castor start` passes both to Docker Compose.
+# Set in .env, and in .env.local to change them: `castor stack:start` passes both to Docker Compose.
 services:
 ###> doctrine/doctrine-bundle ###
   database:

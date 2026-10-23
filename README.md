@@ -31,13 +31,13 @@ or with **Use this template** on GitHub.
 ## Getting started
 
 ```shell
-castor install
+castor app:install
 castor db:reset
 symfony open:local
 ```
 
-`castor install` installs the dependencies, starts the Docker services (PostgreSQL, Mailpit)
-and the web server, then runs the migrations. `castor db:reset` loads the development data:
+`castor app:install` installs the dependencies, asks for the ports of the Docker services (see
+below), starts them (PostgreSQL, Mailpit) and the web server, then runs the migrations. `castor db:reset` loads the development data:
 log in with `admin@example.com` (super admin) or `user@example.com`, and the password
 `correct-horse-battery-staple`.
 
@@ -57,10 +57,11 @@ too:
 | `MAILER_SMTP_PORT` | `1025`  | Mailpit (SMTP)    |
 | `MAILER_WEB_PORT`  | `8025`  | Mailpit (web UI)  |
 
-Change them in `.env.local` when another project already uses them, then run `castor start`
-again. Docker Compose alone reads `.env` only: the Castor tasks give it the `.env` files of the
+Change them in `.env.local` when another project already uses them: `castor env:init` proposes
+free ones (the ports of this project's own containers count as free) and writes them there,
+keeping the other lines of the file. Then run `castor stack:start` again. Docker Compose alone reads `.env` only: the Castor tasks give it the `.env` files of the
 dev environment, in the order of Symfony (`.env`, `.env.local`, `.env.dev`, `.env.dev.local`).
-Run `docker compose` through `castor start` and `castor stop`, or pass these files yourself with
+Run `docker compose` through `castor stack:start` and `castor stack:stop`, or pass these files yourself with
 `--env-file`.
 
 The Castor tasks also give the Symfony CLI the socket of the active Docker context (Docker
@@ -68,14 +69,19 @@ Desktop, OrbStack, Colima...), unless `DOCKER_HOST` is set.
 
 ## Daily tasks
 
-| Task              | What it does                                                    |
-|-------------------|-----------------------------------------------------------------|
-| `castor start`    | Start the Docker services and the web server                    |
-| `castor stop`     | Stop the web server and the Docker services                     |
-| `castor db:reset` | Empty and migrate the database, then load the fixtures          |
-| `castor qa:lint`  | Run all the static checks (`composer lint`)                     |
-| `castor qa:fix`   | Apply the coding standard fixes (`composer fix`)                |
-| `castor qa:test`  | Run the test suite                                              |
+| Task                 | What it does                                                    |
+|----------------------|-----------------------------------------------------------------|
+| `castor app:install` | Install everything and start the stack (first checkout)         |
+| `castor stack:start` | Start the Docker services and the web server                    |
+| `castor stack:stop`  | Stop the web server and the Docker services                     |
+| `castor env:init`    | Choose the ports of the Docker services, in `.env.local`        |
+| `castor db:reset`    | Empty and migrate the database, then load the fixtures          |
+| `castor qa:lint`     | Run all the static checks (`composer lint`)                     |
+| `castor qa:fix`      | Apply the coding standard fixes (`composer fix`)                |
+| `castor qa:test`     | Run the test suite                                              |
+
+The tasks are in `.castor/`, one file per prefix; `castor.php` imports them and gives the
+Symfony CLI the Docker socket.
 
 The mails sent in development land in Mailpit: `symfony open:local:webmail`.
 
@@ -131,7 +137,7 @@ registration, password reset) extend `layout/auth.html.twig`.
 ## Quality
 
 GrumPHP runs ECS, PHPStan, Twig-CS-Fixer, the Composer validation and the YAML lint on the
-staged files before each commit. `castor install` installs its Git hooks.
+staged files before each commit. `castor app:install` installs its Git hooks.
 
 ## After creating a project from the template
 
