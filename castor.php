@@ -56,7 +56,7 @@ function install(): void
 #[AsTask(description: 'Start the Docker services and the web server')]
 function start(): void
 {
-    run(['docker', 'compose', 'up', '--detach', '--wait']);
+    run(docker_compose('up', '--detach', '--wait'));
     run(['symfony', 'server:start', '--daemon']);
     io()->success('The application is running: run "symfony open:local" to open it.');
 }
@@ -65,7 +65,26 @@ function start(): void
 function stop(): void
 {
     run(['symfony', 'server:stop']);
-    run(['docker', 'compose', 'stop']);
+    run(docker_compose('stop'));
+}
+
+/**
+ * A Docker Compose command that reads the .env files of the dev environment in the order of
+ * Symfony, the last one winning: Compose alone reads .env only, not .env.local.
+ *
+ * @return list<string>
+ */
+function docker_compose(string ...$arguments): array
+{
+    $command = ['docker', 'compose'];
+    foreach (['.env', '.env.local', '.env.dev', '.env.dev.local'] as $file) {
+        if (is_file($file)) {
+            $command[] = '--env-file';
+            $command[] = $file;
+        }
+    }
+
+    return [...$command, ...array_values($arguments)];
 }
 
 #[AsTask(name: 'reset', namespace: 'db', description: 'Empty and migrate the database, then load the fixtures')]

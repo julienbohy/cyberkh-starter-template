@@ -57,7 +57,11 @@ too:
 | `MAILER_SMTP_PORT` | `1025`  | Mailpit (SMTP)    |
 | `MAILER_WEB_PORT`  | `8025`  | Mailpit (web UI)  |
 
-Change them in `.env` when another project already uses them, then run `castor start` again.
+Change them in `.env.local` when another project already uses them, then run `castor start`
+again. Docker Compose alone reads `.env` only: the Castor tasks give it the `.env` files of the
+dev environment, in the order of Symfony (`.env`, `.env.local`, `.env.dev`, `.env.dev.local`).
+Run `docker compose` through `castor start` and `castor stop`, or pass these files yourself with
+`--env-file`.
 
 The Castor tasks also give the Symfony CLI the socket of the active Docker context (Docker
 Desktop, OrbStack, Colima...), unless `DOCKER_HOST` is set.
