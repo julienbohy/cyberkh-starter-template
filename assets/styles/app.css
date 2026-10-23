@@ -47,72 +47,78 @@
 }
 
 :root {
-    --background: oklch(1 0 0);
-    --foreground: oklch(0.145 0 0);
+    /* The brand color: #007275. Every color below derives from its hue (197.9): the neutrals are
+       tinted by it, and the text on it is white (5.7:1). */
+    --brand-hue: 197.9;
+    --background: oklch(0.995 0.003 var(--brand-hue));
+    --foreground: oklch(0.18 0.02 var(--brand-hue));
     --card: oklch(1 0 0);
-    --card-foreground: oklch(0.145 0 0);
+    --card-foreground: oklch(0.18 0.02 var(--brand-hue));
     --popover: oklch(1 0 0);
-    --popover-foreground: oklch(0.145 0 0);
-    --primary: oklch(0.205 0 0);
-    --primary-foreground: oklch(0.985 0 0);
-    --secondary: oklch(0.97 0 0);
-    --secondary-foreground: oklch(0.205 0 0);
-    --muted: oklch(0.97 0 0);
-    --muted-foreground: oklch(0.556 0 0);
-    --accent: oklch(0.97 0 0);
-    --accent-foreground: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.18 0.02 var(--brand-hue));
+    --primary: oklch(0.5 0.085 var(--brand-hue));
+    --primary-foreground: oklch(0.985 0.005 var(--brand-hue));
+    --secondary: oklch(0.955 0.014 var(--brand-hue));
+    --secondary-foreground: oklch(0.25 0.03 var(--brand-hue));
+    --muted: oklch(0.965 0.01 var(--brand-hue));
+    --muted-foreground: oklch(0.48 0.025 var(--brand-hue));
+    --accent: oklch(0.94 0.03 var(--brand-hue));
+    --accent-foreground: oklch(0.25 0.05 var(--brand-hue));
     --destructive: oklch(0.577 0.245 27.325);
-    --border: oklch(0.922 0 0);
-    --input: oklch(0.922 0 0);
-    --ring: oklch(0.708 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
+    --border: oklch(0.905 0.015 var(--brand-hue));
+    --input: oklch(0.905 0.015 var(--brand-hue));
+    /* The brand color itself: a focus ring needs 3:1 against the background, it has 5.7:1. */
+    --ring: oklch(0.5 0.085 var(--brand-hue));
+    --chart-1: oklch(0.5 0.085 var(--brand-hue));
+    --chart-2: oklch(0.65 0.1 var(--brand-hue));
+    --chart-3: oklch(0.38 0.065 var(--brand-hue));
+    --chart-4: oklch(0.8 0.08 var(--brand-hue));
+    --chart-5: oklch(0.28 0.045 var(--brand-hue));
     --radius: 0.625rem;
-    --sidebar: oklch(0.985 0 0);
-    --sidebar-foreground: oklch(0.145 0 0);
-    --sidebar-primary: oklch(0.205 0 0);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.97 0 0);
-    --sidebar-accent-foreground: oklch(0.205 0 0);
-    --sidebar-border: oklch(0.922 0 0);
-    --sidebar-ring: oklch(0.708 0 0);
+    --sidebar: oklch(0.975 0.01 var(--brand-hue));
+    --sidebar-foreground: oklch(0.18 0.02 var(--brand-hue));
+    --sidebar-primary: oklch(0.5 0.085 var(--brand-hue));
+    --sidebar-primary-foreground: oklch(0.985 0.005 var(--brand-hue));
+    --sidebar-accent: oklch(0.92 0.04 var(--brand-hue));
+    --sidebar-accent-foreground: oklch(0.18 0.02 var(--brand-hue));
+    --sidebar-border: oklch(0.905 0.015 var(--brand-hue));
+    --sidebar-ring: oklch(0.5 0.085 var(--brand-hue));
 }
 
 .dark {
-    --background: oklch(0.145 0 0);
-    --foreground: oklch(0.985 0 0);
-    --card: oklch(0.205 0 0);
-    --card-foreground: oklch(0.985 0 0);
-    --popover: oklch(0.205 0 0);
-    --popover-foreground: oklch(0.985 0 0);
-    --primary: oklch(0.922 0 0);
-    --primary-foreground: oklch(0.205 0 0);
-    --secondary: oklch(0.269 0 0);
-    --secondary-foreground: oklch(0.985 0 0);
-    --muted: oklch(0.269 0 0);
-    --muted-foreground: oklch(0.708 0 0);
-    --accent: oklch(0.269 0 0);
-    --accent-foreground: oklch(0.985 0 0);
+    /* The primary color is a lighter teal (9.2:1 against the background), with a dark text. */
+    --background: oklch(0.17 0.015 var(--brand-hue));
+    --foreground: oklch(0.97 0.008 var(--brand-hue));
+    --card: oklch(0.21 0.018 var(--brand-hue));
+    --card-foreground: oklch(0.97 0.008 var(--brand-hue));
+    --popover: oklch(0.21 0.018 var(--brand-hue));
+    --popover-foreground: oklch(0.97 0.008 var(--brand-hue));
+    --primary: oklch(0.758 0.095 var(--brand-hue));
+    --primary-foreground: oklch(0.2 0.04 var(--brand-hue));
+    --secondary: oklch(0.27 0.02 var(--brand-hue));
+    --secondary-foreground: oklch(0.97 0.008 var(--brand-hue));
+    --muted: oklch(0.27 0.02 var(--brand-hue));
+    --muted-foreground: oklch(0.72 0.02 var(--brand-hue));
+    --accent: oklch(0.3 0.035 var(--brand-hue));
+    --accent-foreground: oklch(0.97 0.008 var(--brand-hue));
     --destructive: oklch(0.704 0.191 22.216);
     --border: oklch(1 0 0 / 10%);
     --input: oklch(1 0 0 / 15%);
-    --ring: oklch(0.556 0 0);
-    --chart-1: oklch(0.87 0 0);
-    --chart-2: oklch(0.556 0 0);
-    --chart-3: oklch(0.439 0 0);
-    --chart-4: oklch(0.371 0 0);
-    --chart-5: oklch(0.269 0 0);
-    --sidebar: oklch(0.205 0 0);
-    --sidebar-foreground: oklch(0.985 0 0);
-    --sidebar-primary: oklch(0.488 0.243 264.376);
-    --sidebar-primary-foreground: oklch(0.985 0 0);
-    --sidebar-accent: oklch(0.269 0 0);
-    --sidebar-accent-foreground: oklch(0.985 0 0);
+    /* A lighter teal than #007275, which would hardly stand out from the dark background. */
+    --ring: oklch(0.758 0.095 var(--brand-hue));
+    --chart-1: oklch(0.758 0.095 var(--brand-hue));
+    --chart-2: oklch(0.6 0.1 var(--brand-hue));
+    --chart-3: oklch(0.85 0.06 var(--brand-hue));
+    --chart-4: oklch(0.45 0.08 var(--brand-hue));
+    --chart-5: oklch(0.93 0.03 var(--brand-hue));
+    --sidebar: oklch(0.2 0.018 var(--brand-hue));
+    --sidebar-foreground: oklch(0.97 0.008 var(--brand-hue));
+    --sidebar-primary: oklch(0.758 0.095 var(--brand-hue));
+    --sidebar-primary-foreground: oklch(0.2 0.04 var(--brand-hue));
+    --sidebar-accent: oklch(0.3 0.04 var(--brand-hue));
+    --sidebar-accent-foreground: oklch(0.97 0.008 var(--brand-hue));
     --sidebar-border: oklch(1 0 0 / 10%);
-    --sidebar-ring: oklch(0.556 0 0);
+    --sidebar-ring: oklch(0.758 0.095 var(--brand-hue));
 }
 
 @layer base {
