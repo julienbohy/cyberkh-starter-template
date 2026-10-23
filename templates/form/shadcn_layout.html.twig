@@ -73,8 +73,10 @@
     {{- component('Input', input_attr) -}}
 {%- endblock -%}
 
+{#- With its attributes: the CSRF field carries data-controller="csrf-protection", which the
+    stateless CSRF protection needs (assets/controllers/csrf_protection_controller.js). -#}
 {%- block hidden_widget -%}
-    <input type="hidden" id="{{ id }}" name="{{ full_name }}"{% if value is not empty %} value="{{ value }}"{% endif %}>
+    <input type="hidden" {{ block('widget_attributes') }}{% if value is not empty %} value="{{ value }}"{% endif %}>
 {%- endblock -%}
 
 {%- block choice_widget_expanded -%}
