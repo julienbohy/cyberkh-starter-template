@@ -1,0 +1,14 @@
+email:
+    not_blank: Saisissez votre adresse email.
+    invalid: Cette adresse email n'est pas valide.
+    already_used: Un compte existe déjà avec cette adresse email.
+
+password:
+    not_blank: Saisissez un mot de passe.
+    too_short: 'Le mot de passe doit contenir au moins {{ limit }} caractères.'
+    too_weak: Ce mot de passe est trop facile à deviner.
+    compromised: Ce mot de passe est apparu dans une fuite de données, choisissez-en un autre.
+    mismatch: Les deux mots de passe ne correspondent pas.
+
+registration:
+    agree_terms: Vous devez accepter les conditions d'utilisation.

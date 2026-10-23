@@ -1,0 +1,17 @@
+{%- props
+    ## The heading of the page.
+    title,
+    ## A line under the heading.
+    description = null
+-%}
+<twig:Card {{ ...attributes.defaults({class: 'mx-auto w-full max-w-sm'}) }}>
+    {#- Captured here: in Card:Content, one level deeper, outerBlocks would be the blocks of Card. -#}
+    {%- set auth_card_content %}{{ block(outerBlocks.content) }}{% endset -%}
+    <twig:Card:Header>
+        <twig:Card:Title><h1>{{ title }}</h1></twig:Card:Title>
+        {% if description %}
+            <twig:Card:Description>{{ description }}</twig:Card:Description>
+        {% endif %}
+    </twig:Card:Header>
+    <twig:Card:Content>{{ auth_card_content }}</twig:Card:Content>
+</twig:Card>

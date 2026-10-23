@@ -1,0 +1,21 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'registration.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <twig:AuthCard :title="'registration.title'|trans" :description="'registration.description'|trans">
+        {{ form_start(registrationForm, {attr: {class: 'space-y-6'}}) }}
+            {{ form_errors(registrationForm) }}
+            {{ form_row(registrationForm.email) }}
+            {{ form_row(registrationForm.plainPassword) }}
+            {{ form_row(registrationForm.agreeTerms) }}
+
+            <twig:Button type="submit" class="w-full">{{ 'registration.submit'|trans }}</twig:Button>
+        {{ form_end(registrationForm) }}
+
+        <p class="mt-6 text-center text-sm text-muted-foreground">
+            {{ 'registration.has_account'|trans }}
+            <a href="{{ path('app_login') }}" class="text-foreground underline underline-offset-4">{{ 'nav.login'|trans }}</a>
+        </p>
+    </twig:AuthCard>
+{% endblock %}

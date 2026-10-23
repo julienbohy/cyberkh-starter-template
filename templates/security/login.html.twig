@@ -1,0 +1,42 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'login.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <twig:AuthCard :title="'login.title'|trans" :description="'login.description'|trans">
+        {% if error %}
+            <twig:Alert variant="destructive" class="mb-6">
+                <twig:Alert:Description>{{ error.messageKey|trans(error.messageData, 'security') }}</twig:Alert:Description>
+            </twig:Alert>
+        {% endif %}
+
+        <twig:Form method="post">
+            <twig:Form:Item>
+                <twig:Form:Label for="username">{{ 'login.email'|trans }}</twig:Form:Label>
+                <twig:Input type="email" id="username" name="_username" value="{{ last_username }}" autocomplete="email" required autofocus />
+            </twig:Form:Item>
+            <twig:Form:Item>
+                <div class="flex items-center justify-between">
+                    <twig:Form:Label for="password">{{ 'login.password'|trans }}</twig:Form:Label>
+                    <a href="{{ path('app_forgot_password_request') }}" class="text-sm underline-offset-4 hover:underline">{{ 'login.forgot_password'|trans }}</a>
+                </div>
+                <twig:Input type="password" id="password" name="_password" autocomplete="current-password" required />
+            </twig:Form:Item>
+            <div class="flex items-center gap-2">
+                <twig:Checkbox id="remember_me" name="_remember_me" />
+                <twig:Label for="remember_me">{{ 'login.remember_me'|trans }}</twig:Label>
+            </div>
+
+            <input type="hidden" name="_csrf_token" data-controller="csrf-protection" value="{{ csrf_token('authenticate') }}">
+
+            <twig:Button type="submit" class="w-full">{{ 'login.submit'|trans }}</twig:Button>
+        </twig:Form>
+
+        {% if registration_enabled %}
+            <p class="mt-6 text-center text-sm text-muted-foreground">
+                {{ 'login.no_account'|trans }}
+                <a href="{{ path('app_register') }}" class="text-foreground underline underline-offset-4">{{ 'nav.register'|trans }}</a>
+            </p>
+        {% endif %}
+    </twig:AuthCard>
+{% endblock %}

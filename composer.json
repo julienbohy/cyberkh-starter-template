@@ -1,0 +1,159 @@
+{
+    "name": "julienbohy/cyberkh-starter-template",
+    "description": "Symfony 8.1 starter template: PHP 8.5, Doctrine/PostgreSQL, users with email verification, Symfony UX, Tailwind + shadcn, PHPStan max, Castor",
+    "type": "project",
+    "license": ["MIT"],
+    "minimum-stability": "stable",
+    "prefer-stable": true,
+    "require": {
+        "php": ">=8.5",
+        "ext-ctype": "*",
+        "ext-iconv": "*",
+        "doctrine/doctrine-bundle": "^3.3",
+        "doctrine/doctrine-migrations-bundle": "^4.0",
+        "doctrine/orm": "^3.7",
+        "phpdocumentor/reflection-docblock": "^6.0",
+        "phpstan/phpdoc-parser": "^2.3",
+        "symfony/asset": "8.1.*",
+        "symfony/asset-mapper": "8.1.*",
+        "symfony/console": "8.1.*",
+        "symfony/doctrine-messenger": "8.1.*",
+        "symfony/dotenv": "8.1.*",
+        "symfony/expression-language": "8.1.*",
+        "symfony/flex": "^2",
+        "symfony/form": "8.1.*",
+        "symfony/framework-bundle": "8.1.*",
+        "symfony/http-client": "8.1.*",
+        "symfony/intl": "8.1.*",
+        "symfony/mailer": "8.1.*",
+        "symfony/messenger": "8.1.*",
+        "symfony/mime": "8.1.*",
+        "symfony/monolog-bundle": "^4.1",
+        "symfony/notifier": "8.1.*",
+        "symfony/process": "8.1.*",
+        "symfony/property-access": "8.1.*",
+        "symfony/property-info": "8.1.*",
+        "symfony/rate-limiter": "8.1.*",
+        "symfony/runtime": "8.1.*",
+        "symfony/security-bundle": "8.1.*",
+        "symfony/serializer": "8.1.*",
+        "symfony/stimulus-bundle": "^3.6",
+        "symfony/translation": "8.1.*",
+        "symfony/twig-bundle": "8.1.*",
+        "symfony/uid": "8.1.*",
+        "symfony/ux-icons": "^3.6",
+        "symfony/ux-live-component": "^3.6",
+        "symfony/ux-turbo": "^3.6",
+        "symfony/ux-twig-component": "^3.6",
+        "symfony/validator": "8.1.*",
+        "symfony/web-link": "8.1.*",
+        "symfony/yaml": "8.1.*",
+        "symfonycasts/reset-password-bundle": "^1.25",
+        "symfonycasts/tailwind-bundle": "^1.0",
+        "symfonycasts/verify-email-bundle": "^1.18",
+        "tales-from-a-dev/twig-tailwind-extra": "^1.5",
+        "twig/extra-bundle": "^3.29",
+        "twig/html-extra": "^3.29"
+    },
+    "config": {
+        "allow-plugins": {
+            "php-http/discovery": true,
+            "symfony/flex": true,
+            "symfony/runtime": true,
+            "phpstan/extension-installer": true,
+            "phpro/grumphp-shim": true
+        },
+        "bump-after-update": false,
+        "sort-packages": true
+    },
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "App\\Tests\\": "tests/"
+        }
+    },
+    "replace": {
+        "symfony/polyfill-ctype": "*",
+        "symfony/polyfill-iconv": "*",
+        "symfony/polyfill-php72": "*",
+        "symfony/polyfill-php73": "*",
+        "symfony/polyfill-php74": "*",
+        "symfony/polyfill-php80": "*",
+        "symfony/polyfill-php81": "*",
+        "symfony/polyfill-php82": "*",
+        "symfony/polyfill-php83": "*",
+        "symfony/polyfill-php84": "*"
+    },
+    "scripts": {
+        "auto-scripts": {
+            "cache:clear": "symfony-cmd",
+            "assets:install %PUBLIC_DIR%": "symfony-cmd",
+            "importmap:install": "symfony-cmd",
+            "tailwind:build": "symfony-cmd"
+        },
+        "post-install-cmd": [
+            "@auto-scripts"
+        ],
+        "post-update-cmd": [
+            "@auto-scripts"
+        ],
+        "lint": [
+            "@php bin/console lint:container",
+            "@php bin/console lint:yaml config --parse-tags",
+            "@php bin/console lint:twig templates",
+            "ecs check",
+            "phpstan analyse --memory-limit=1G",
+            "twig-cs-fixer lint templates",
+            "@composer audit",
+            "@php bin/console importmap:audit"
+        ],
+        "fix": [
+            "ecs check --fix",
+            "twig-cs-fixer fix templates"
+        ]
+    },
+    "scripts-descriptions": {
+        "lint": "Run all static checks (container, YAML, Twig, ECS, PHPStan, Twig-CS-Fixer, audits)",
+        "fix": "Apply ECS and Twig-CS-Fixer fixes"
+    },
+    "conflict": {
+        "symfony/symfony": "*"
+    },
+    "extra": {
+        "symfony": {
+            "allow-contrib": true,
+            "require": "8.1.*",
+            "docker": true
+        }
+    },
+    "require-dev": {
+        "dama/doctrine-test-bundle": "^8.7",
+        "phpro/grumphp-shim": "^2.26",
+        "phpstan/extension-installer": "^1.4",
+        "phpstan/phpstan": "^2.3",
+        "phpstan/phpstan-deprecation-rules": "^2.0",
+        "phpstan/phpstan-doctrine": "^2.0",
+        "phpstan/phpstan-phpunit": "^2.1",
+        "phpstan/phpstan-strict-rules": "^2.1",
+        "phpstan/phpstan-symfony": "^2.1",
+        "phpunit/phpunit": "^13.4",
+        "shipmonk/dead-code-detector": "^1.4",
+        "spaze/phpstan-disallowed-calls": "^4.15",
+        "staabm/phpstan-todo-by": "^0.3.5",
+        "symfony/browser-kit": "8.1.*",
+        "symfony/css-selector": "8.1.*",
+        "symfony/debug-bundle": "8.1.*",
+        "symfony/maker-bundle": "^1.68",
+        "symfony/stopwatch": "8.1.*",
+        "symfony/ux-toolkit": "^3.6",
+        "symfony/web-profiler-bundle": "8.1.*",
+        "symplify/easy-coding-standard": "^13.3",
+        "symplify/phpstan-rules": "^14.19",
+        "vincentlanglet/twig-cs-fixer": "^4.1",
+        "zenstruck/foundry": "^2.14"
+    }
+}

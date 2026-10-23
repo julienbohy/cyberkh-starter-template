@@ -1,0 +1,74 @@
+app:
+    name: Starter Template
+
+nav:
+    login: Se connecter
+    logout: Se déconnecter
+    register: Créer un compte
+
+home:
+    title: Bienvenue
+    logged_in_as: 'Vous êtes connecté avec %email%.'
+    anonymous: Connectez-vous pour accéder à votre compte.
+
+email:
+    link_expires: 'Ce lien expire dans %delay%.'
+
+login:
+    title: Connexion
+    description: Saisissez votre email et votre mot de passe.
+    email: Email
+    password: Mot de passe
+    forgot_password: Mot de passe oublié ?
+    remember_me: Se souvenir de moi
+    submit: Se connecter
+    no_account: Pas encore de compte ?
+
+registration:
+    title: Créer un compte
+    description: Un email de confirmation vous sera envoyé.
+    submit: Créer mon compte
+    has_account: Déjà un compte ?
+    form:
+        email: Email
+        email_placeholder: vous@exemple.com
+        password: Mot de passe
+        password_help: Au moins 12 caractères, difficile à deviner.
+        agree_terms: J'accepte les conditions d'utilisation
+    email:
+        subject: Confirmez votre adresse email
+        heading: Bienvenue !
+        intro: Confirmez votre adresse email pour activer votre compte.
+        link: Confirmer mon adresse email
+    flash:
+        check_email: Votre compte est créé. Cliquez sur le lien reçu par email pour l'activer.
+        invalid_link: Ce lien de confirmation n'est pas valide.
+        email_verified: Votre adresse email est confirmée, vous pouvez vous connecter.
+
+reset_password:
+    back_to_login: Retour à la connexion
+    form:
+        email: Email
+        new_password: Nouveau mot de passe
+        repeat_password: Confirmez le mot de passe
+    request:
+        title: Mot de passe oublié
+        description: Saisissez votre email, nous vous enverrons un lien pour choisir un nouveau mot de passe.
+        submit: Envoyer le lien
+    check_email:
+        title: Vérifiez vos emails
+        sent: Si un compte correspond à cette adresse, un email contenant un lien de réinitialisation vient de lui être envoyé.
+        not_received: Rien reçu ? Vérifiez vos spams ou
+        try_again: réessayez
+    reset:
+        title: Nouveau mot de passe
+        description: Choisissez le nouveau mot de passe de votre compte.
+        submit: Changer le mot de passe
+    email:
+        subject: Réinitialisation de votre mot de passe
+        heading: Réinitialisation du mot de passe
+        intro: Pour choisir un nouveau mot de passe, cliquez sur le lien ci-dessous.
+        link: Choisir un nouveau mot de passe
+        ignore: Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
+    flash:
+        password_changed: Votre mot de passe a été changé, vous pouvez vous connecter.

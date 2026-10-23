@@ -1,0 +1,74 @@
+app:
+    name: Starter Template
+
+nav:
+    login: Log in
+    logout: Log out
+    register: Sign up
+
+home:
+    title: Welcome
+    logged_in_as: 'You are logged in as %email%.'
+    anonymous: Log in to access your account.
+
+email:
+    link_expires: 'This link expires in %delay%.'
+
+login:
+    title: Log in
+    description: Enter your email and your password.
+    email: Email
+    password: Password
+    forgot_password: Forgot your password?
+    remember_me: Remember me
+    submit: Log in
+    no_account: No account yet?
+
+registration:
+    title: Sign up
+    description: A confirmation email will be sent to you.
+    submit: Create my account
+    has_account: Already have an account?
+    form:
+        email: Email
+        email_placeholder: you@example.com
+        password: Password
+        password_help: At least 12 characters, hard to guess.
+        agree_terms: I agree to the terms of use
+    email:
+        subject: Confirm your email address
+        heading: Welcome!
+        intro: Confirm your email address to activate your account.
+        link: Confirm my email address
+    flash:
+        check_email: Your account is created. Click the link sent to your email to activate it.
+        invalid_link: This confirmation link is not valid.
+        email_verified: Your email address is confirmed, you can log in.
+
+reset_password:
+    back_to_login: Back to login
+    form:
+        email: Email
+        new_password: New password
+        repeat_password: Repeat the password
+    request:
+        title: Forgot your password
+        description: Enter your email, we will send you a link to choose a new password.
+        submit: Send the link
+    check_email:
+        title: Check your email
+        sent: If an account matches this address, an email with a reset link was just sent to it.
+        not_received: Nothing received? Check your spam folder or
+        try_again: try again
+    reset:
+        title: New password
+        description: Choose the new password of your account.
+        submit: Change the password
+    email:
+        subject: Your password reset request
+        heading: Password reset
+        intro: To choose a new password, click the link below.
+        link: Choose a new password
+        ignore: If you did not ask for it, ignore this email.
+    flash:
+        password_changed: Your password was changed, you can log in.

@@ -1,0 +1,90 @@
+{# Renders the Symfony forms with the components of the UX Toolkit shadcn kit (templates/components). #}
+{% use 'form_div_layout.html.twig' %}
+
+{%- block form_row -%}
+    {%- set widget_attr = help is not empty ? {attr: {'aria-describedby': id ~ '_help'}} : {} -%}
+    {% component 'Form:Item' %}
+        {% block content %}
+            {{- form_label(form) -}}
+            {{- form_widget(form, widget_attr) -}}
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        {% endblock %}
+    {% endcomponent %}
+{%- endblock -%}
+
+{%- block checkbox_row -%}
+    {% component 'Form:Item' %}
+        {% block content %}
+            <div class="flex items-center gap-2">
+                {{- form_widget(form) -}}
+                {{- form_label(form) -}}
+            </div>
+            {{- form_help(form) -}}
+            {{- form_errors(form) -}}
+        {% endblock %}
+    {% endcomponent %}
+{%- endblock -%}
+
+{%- block form_label -%}
+    {%- if label is not same as(false) -%}
+        {%- set label = label is empty ? name|humanize : label -%}
+        {% component 'Form:Label' with {for: compound ? false : id} %}
+            {% block content %}
+                {{- translation_domain is same as(false) ? label : label|trans(label_translation_parameters, translation_domain) -}}
+            {% endblock %}
+        {% endcomponent %}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block form_help -%}
+    {%- if help is not empty -%}
+        {% component 'Form:Description' with {id: id ~ '_help'} %}
+            {% block content %}
+                {{- translation_domain is same as(false) ? help : help|trans(help_translation_parameters, translation_domain) -}}
+            {% endblock %}
+        {% endcomponent %}
+    {%- endif -%}
+{%- endblock -%}
+
+{%- block form_errors -%}
+    {%- for error in errors -%}
+        {% component 'Form:Message' %}
+            {% block content %}{{ error.message }}{% endblock %}
+        {% endcomponent %}
+    {%- endfor -%}
+{%- endblock -%}
+
+{%- block form_widget_simple -%}
+    {%- set input_attr = attr|merge({
+        type: type|default('text'),
+        id: id,
+        name: full_name,
+        required: required,
+        disabled: disabled,
+        'aria-invalid': errors|length > 0 ? 'true' : false,
+    }) -%}
+    {%- if value is not empty or value is same as('0') -%}
+        {%- set input_attr = input_attr|merge({value: value}) -%}
+    {%- endif -%}
+    {%- if attr.placeholder is defined and translation_domain is not same as(false) -%}
+        {%- set input_attr = input_attr|merge({placeholder: attr.placeholder|trans(attr_translation_parameters, translation_domain)}) -%}
+    {%- endif -%}
+    {{- component('Input', input_attr) -}}
+{%- endblock -%}
+
+{%- block hidden_widget -%}
+    <input type="hidden" id="{{ id }}" name="{{ full_name }}"{% if value is not empty %} value="{{ value }}"{% endif %}>
+{%- endblock -%}
+
+{%- block checkbox_widget -%}
+    {{- component('Checkbox', attr|merge({
+        id: id,
+        name: full_name,
+        value: value,
+        checked: checked,
+        required: required,
+        disabled: disabled,
+        'aria-invalid': errors|length > 0 ? 'true' : false,
+    })) -}}
+{%- endblock -%}

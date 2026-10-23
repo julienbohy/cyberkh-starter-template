@@ -1,0 +1,18 @@
+name: Technical task
+description: "Refactoring, tooling, dependencies, infrastructure: work with no visible change for the users."
+labels: ["tech"]
+body:
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The current limit or the risk this task addresses.
+    validations:
+      required: true
+  - type: textarea
+    id: what
+    attributes:
+      label: What
+      description: The expected change, and what it does not cover.
+    validations:
+      required: true

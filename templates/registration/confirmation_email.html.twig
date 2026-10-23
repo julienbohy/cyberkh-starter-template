@@ -1,0 +1,7 @@
+<h1>{{ 'registration.email.heading'|trans }}</h1>
+
+<p>{{ 'registration.email.intro'|trans }}</p>
+
+<p><a href="{{ signedUrl|raw }}">{{ 'registration.email.link'|trans }}</a></p>
+
+<p>{{ 'email.link_expires'|trans({'%delay%': expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle')}) }}</p>

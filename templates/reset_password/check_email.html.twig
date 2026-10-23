@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'reset_password.check_email.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <twig:AuthCard :title="'reset_password.check_email.title'|trans">
+        <div class="space-y-4 text-sm text-muted-foreground">
+            <p>{{ 'reset_password.check_email.sent'|trans }}</p>
+            <p>{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>
+            <p>
+                {{ 'reset_password.check_email.not_received'|trans }}
+                <a href="{{ path('app_forgot_password_request') }}" class="text-foreground underline underline-offset-4">{{ 'reset_password.check_email.try_again'|trans }}</a>
+            </p>
+        </div>
+    </twig:AuthCard>
+{% endblock %}

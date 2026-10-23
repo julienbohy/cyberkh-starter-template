@@ -1,0 +1,3 @@
+security:
+    login:
+        email_not_verified: Confirm your email address first, with the link received at the registration.

@@ -1,0 +1,92 @@
+# Cyberkh Starter Template
+
+A Symfony starter template. Create a new project from it with the Symfony CLI:
+
+```shell
+symfony new my-project --skeleton=julienbohy/cyberkh-starter-template
+```
+
+or with **Use this template** on GitHub.
+
+## Stack
+
+- **PHP 8.5** (`.php-version`) and **Symfony 8.1**
+- **Doctrine ORM** with migrations, on **PostgreSQL 18**
+- **Messenger** (Doctrine transport), **Mailer**, **Notifier**
+- **Users**: login, registration with email verification, password reset
+- **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
+- **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
+- **PHPUnit**, **Foundry** and **DAMA Doctrine Test Bundle** for the tests
+- **PHPStan** (level max), **ECS**, **Twig-CS-Fixer** and **GrumPHP** for the quality
+
+## Requirements
+
+- [Symfony CLI](https://symfony.com/download)
+- PHP 8.5, with the `pdo_pgsql` and `intl` extensions
+- Docker with Docker Compose
+- [Castor](https://castor.jolicode.com)
+
+## Getting started
+
+```shell
+castor install
+castor db:reset
+symfony open:local
+```
+
+`castor install` installs the dependencies, starts the Docker services (PostgreSQL, Mailpit)
+and the web server, then runs the migrations. `castor db:reset` loads the development data:
+log in with `user@example.com` and the password `correct-horse-battery-staple`.
+
+The web server also runs two workers (`.symfony.local.yaml`): the Messenger consumer, which
+sends the emails, and the Tailwind watcher.
+
+Every command goes through the Symfony CLI: it uses the PHP version of `.php-version` and
+exposes the environment variables of the Docker services (`DATABASE_URL`, `MAILER_DSN`...)
+to the application. If the Symfony CLI does not find the Docker services, check that
+`DOCKER_HOST` points to the socket of your Docker engine.
+
+## Daily tasks
+
+| Task              | What it does                                                    |
+|-------------------|-----------------------------------------------------------------|
+| `castor start`    | Start the Docker services and the web server                    |
+| `castor stop`     | Stop the web server and the Docker services                     |
+| `castor db:reset` | Empty and migrate the database, then load the fixtures          |
+| `castor qa:lint`  | Run all the static checks (`composer lint`)                     |
+| `castor qa:fix`   | Apply the coding standard fixes (`composer fix`)                |
+| `castor qa:test`  | Run the test suite                                              |
+
+The mails sent in development land in Mailpit: `symfony open:local:webmail`.
+
+## Users
+
+| Page               | Route                         |
+|--------------------|-------------------------------|
+| Login, logout      | `/login`, `/logout`           |
+| Registration       | `/register`                   |
+| Email verification | `/verify/email` (signed link) |
+| Password reset     | `/reset-password`             |
+
+- A user cannot log in before verifying their email address (`App\Security\UserChecker`).
+- The registration is turned off with `APP_REGISTRATION_ENABLED=0`: `/register` answers 404
+  and its links disappear. The verification links already sent keep working.
+- The emails are sent from `MAILER_FROM`, through the `async` Messenger transport.
+- The pages are translated in French (the default locale) and in English (`translations/`).
+- The forms are rendered with the shadcn components (`templates/form/shadcn_layout.html.twig`).
+
+## Quality
+
+GrumPHP runs ECS, PHPStan, Twig-CS-Fixer, the Composer validation and the YAML lint on the
+staged files before each commit. `castor install` installs its Git hooks.
+
+## After creating a project from the template
+
+- Rename the project in this README (and in `composer.json` with **Use this template**: Flex removes the name)
+- Change the database credentials, and set the `APP_SECRET` of production with `symfony console secrets:set`
+- Set `MAILER_FROM` and the application name (`app.name` in `translations/`)
+- Choose a license: Symfony Flex removes `LICENSE` and makes the project `proprietary`
+
+## License
+
+[MIT](LICENSE)

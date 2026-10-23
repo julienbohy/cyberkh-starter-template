@@ -1,0 +1,14 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}{{ 'reset_password.reset.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <twig:AuthCard :title="'reset_password.reset.title'|trans" :description="'reset_password.reset.description'|trans">
+        {{ form_start(resetForm, {attr: {class: 'space-y-6'}}) }}
+            {{ form_errors(resetForm) }}
+            {{ form_row(resetForm.plainPassword) }}
+
+            <twig:Button type="submit" class="w-full">{{ 'reset_password.reset.submit'|trans }}</twig:Button>
+        {{ form_end(resetForm) }}
+    </twig:AuthCard>
+{% endblock %}

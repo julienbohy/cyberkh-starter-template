@@ -1,0 +1,32 @@
+name: Bug
+description: Something does not work as expected.
+labels: ["bug"]
+body:
+  - type: textarea
+    id: actual
+    attributes:
+      label: What happens
+      description: The observed behavior, with the error message or a screenshot if there is one.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: What should happen
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      placeholder: |
+        1. Go to ...
+        2. Click on ...
+        3. See ...
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: Environment, browser, version, logs...

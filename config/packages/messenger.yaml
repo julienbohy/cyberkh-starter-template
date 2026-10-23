@@ -1,0 +1,19 @@
+framework:
+    messenger:
+        failure_transport: failed
+
+        transports:
+            # https://symfony.com/doc/current/messenger.html#transport-configuration
+            async: '%env(MESSENGER_TRANSPORT_DSN)%'
+            failed: 'doctrine://default?queue_name=failed'
+            sync: 'sync://'
+
+        routing:
+            Symfony\Component\Mailer\Messenger\SendEmailMessage: async
+
+when@test:
+    framework:
+        messenger:
+            transports:
+                # The emails are sent right away, so that the tests can assert them.
+                async: 'sync://'

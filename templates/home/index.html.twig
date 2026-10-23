@@ -1,0 +1,16 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <twig:Card class="mx-auto max-w-lg">
+        <twig:Card:Header>
+            <twig:Card:Title><h1>{{ 'home.title'|trans }}</h1></twig:Card:Title>
+            <twig:Card:Description>
+                {% if app.user %}
+                    {{ 'home.logged_in_as'|trans({'%email%': app.user.userIdentifier}) }}
+                {% else %}
+                    {{ 'home.anonymous'|trans }}
+                {% endif %}
+            </twig:Card:Description>
+        </twig:Card:Header>
+    </twig:Card>
+{% endblock %}
