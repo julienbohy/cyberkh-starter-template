@@ -1,0 +1,16 @@
+{#- The photo of a user, or the initial of their email until it loads (or when they have none).
+    The URL carries the name of the photo: a new photo is a new URL, which the browser keeps. -#}
+{%- props
+    ## App\Entity\User The user.
+    user,
+    ## 'sm'|'default'|'lg' The size of the Avatar component (or set a size class).
+    size = 'default',
+    ## 'small'|'large' The thumbnail: 64 or 256 pixels (config/packages/liip_imagine.yaml).
+    thumbnail = 'small'
+-%}
+<twig:Avatar size="{{ size }}" {{ ...attributes }}>
+    {% if user.avatarName %}
+        <twig:Avatar:Image src="{{ path('app_avatar', {id: user.id, size: thumbnail, v: user.avatarName}) }}" alt="" />
+    {% endif %}
+    <twig:Avatar:Fallback>{{ user.email|first|upper }}</twig:Avatar:Fallback>
+</twig:Avatar>

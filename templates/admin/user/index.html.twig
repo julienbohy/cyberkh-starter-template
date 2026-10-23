@@ -32,7 +32,10 @@
                 {% for user in users.items %}
                     <twig:Table:Row>
                         <twig:Table:Cell class="font-medium">
-                            <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="underline-offset-4 hover:underline">{{ user.email }}</a>
+                            <div class="flex items-center gap-3">
+                                <twig:UserAvatar :user="user" size="sm" />
+                                <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="underline-offset-4 hover:underline">{{ user.email }}</a>
+                            </div>
                         </twig:Table:Cell>
                         <twig:Table:Cell>
                             <div class="flex flex-wrap gap-1">

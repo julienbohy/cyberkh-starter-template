@@ -9,6 +9,12 @@ password:
     too_weak: Ce mot de passe est trop facile à deviner.
     compromised: Ce mot de passe est apparu dans une fuite de données, choisissez-en un autre.
     mismatch: Les deux mots de passe ne correspondent pas.
+    current_wrong: Ce n'est pas votre mot de passe actuel.
 
 registration:
     agree_terms: Vous devez accepter les conditions d'utilisation.
+
+avatar:
+    too_large: La photo dépasse 2 Mo.
+    wrong_type: La photo doit être au format JPEG, PNG ou WebP.
+    too_small: La photo doit faire au moins 128 × 128 pixels.

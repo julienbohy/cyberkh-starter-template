@@ -1,0 +1,27 @@
+# The thumbnails of the photos of the users. App\Controller\AvatarController makes and serves them:
+# the routes of the bundle, which serve its cache publicly, are not imported.
+# https://symfony.com/doc/current/bundles/LiipImagineBundle/basic-usage.html
+liip_imagine:
+    driver: 'gd'
+    # The Twig filter of the bundle is not used: loaded only when called.
+    twig:
+        mode: lazy
+
+    loaders:
+        avatars:
+            flysystem:
+                filesystem_service: avatars.storage
+
+    filter_sets:
+        avatar_small:
+            data_loader: avatars
+            format: webp
+            quality: 85
+            filters:
+                thumbnail: { size: [64, 64], mode: outbound }
+        avatar_large:
+            data_loader: avatars
+            format: webp
+            quality: 85
+            filters:
+                thumbnail: { size: [256, 256], mode: outbound }

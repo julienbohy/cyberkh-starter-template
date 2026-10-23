@@ -12,6 +12,7 @@ nav:
     users: Users
     impersonating: 'You are logged in as %email%.'
     exit_impersonation: Back to my account
+    profile: My profile
 
 dashboard:
     title: Dashboard
@@ -144,3 +145,20 @@ admin:
             heading: 'Welcome to %app%'
             intro: An account was just created for you. Choose your password to activate it.
             link: Choose my password
+
+profile:
+    title: My profile
+    avatar:
+        title: Photo
+        file: New photo
+        help: JPEG, PNG or WebP, 2 MB at most, at least 128 × 128 pixels.
+        submit: Save the photo
+        delete: Delete the photo
+    password:
+        title: Password
+        current: Current password
+        submit: Change the password
+    flash:
+        avatar_saved: Your photo was saved.
+        avatar_deleted: Your photo was deleted.
+        password_changed: Your password was changed.

@@ -12,6 +12,7 @@ nav:
     users: Utilisateurs
     impersonating: 'Vous êtes connecté en tant que %email%.'
     exit_impersonation: Revenir à mon compte
+    profile: Mon profil
 
 dashboard:
     title: Tableau de bord
@@ -144,3 +145,20 @@ admin:
             heading: 'Bienvenue sur %app%'
             intro: Un compte vient d'être créé pour vous. Choisissez votre mot de passe pour l'activer.
             link: Choisir mon mot de passe
+
+profile:
+    title: Mon profil
+    avatar:
+        title: Photo
+        file: Nouvelle photo
+        help: JPEG, PNG ou WebP, 2 Mo au plus, d'au moins 128 × 128 pixels.
+        submit: Enregistrer la photo
+        delete: Supprimer la photo
+    password:
+        title: Mot de passe
+        current: Mot de passe actuel
+        submit: Changer le mot de passe
+    flash:
+        avatar_saved: Votre photo a été enregistrée.
+        avatar_deleted: Votre photo a été supprimée.
+        password_changed: Votre mot de passe a été changé.

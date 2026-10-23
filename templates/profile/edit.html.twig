@@ -1,0 +1,55 @@
+{% extends 'layout/app.html.twig' %}
+
+{% set breadcrumbs = [{label: 'profile.title'|trans}] %}
+
+{% block title %}{{ 'profile.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        <h1 class="text-2xl font-semibold">{{ 'profile.title'|trans }}</h1>
+
+        <div class="grid items-start gap-6 lg:grid-cols-2">
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title><h2>{{ 'profile.avatar.title'|trans }}</h2></twig:Card:Title>
+                </twig:Card:Header>
+                <twig:Card:Content class="space-y-6">
+                    <div class="flex items-center gap-4">
+                        <twig:UserAvatar :user="app.user" thumbnail="large" class="size-24 text-2xl" />
+                        {% if app.user.avatarName %}
+                            <form method="post" action="{{ path('app_profile_avatar_delete') }}">
+                                <input type="hidden" name="_token" value="{{ csrf_token('delete-avatar') }}">
+                                <twig:Button type="submit" variant="outline" size="sm">
+                                    <twig:ux:icon name="lucide:trash-2" aria-hidden="true" />
+                                    {{ 'profile.avatar.delete'|trans }}
+                                </twig:Button>
+                            </form>
+                        {% endif %}
+                    </div>
+
+                    {{ form_start(avatarForm, {attr: {class: 'space-y-6'}}) }}
+                        {{ form_errors(avatarForm) }}
+                        {{ form_row(avatarForm.avatarFile) }}
+
+                        <twig:Button type="submit">{{ 'profile.avatar.submit'|trans }}</twig:Button>
+                    {{ form_end(avatarForm) }}
+                </twig:Card:Content>
+            </twig:Card>
+
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title><h2>{{ 'profile.password.title'|trans }}</h2></twig:Card:Title>
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    {{ form_start(passwordForm, {attr: {class: 'space-y-6'}}) }}
+                        {{ form_errors(passwordForm) }}
+                        {{ form_row(passwordForm.currentPassword) }}
+                        {{ form_row(passwordForm.plainPassword) }}
+
+                        <twig:Button type="submit">{{ 'profile.password.submit'|trans }}</twig:Button>
+                    {{ form_end(passwordForm) }}
+                </twig:Card:Content>
+            </twig:Card>
+        </div>
+    </div>
+{% endblock %}

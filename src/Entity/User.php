@@ -7,16 +7,19 @@ use App\Security\Role;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
 use Symfony\Component\Validator\Constraints as Assert;
+use Vich\UploaderBundle\Mapping\Attribute as Vich;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'email.already_used')]
+#[Vich\Uploadable]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
@@ -53,6 +56,35 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
 
     #[ORM\Column]
     private \DateTimeImmutable $createdAt;
+
+    /**
+     * The photo of the profile, while it is uploaded: VichUploader stores it, and keeps its name.
+     */
+    #[Vich\UploadableField(mapping: 'avatar', fileNameProperty: 'avatarName')]
+    #[Assert\Image(
+        maxSize: '2M',
+        mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+        minWidth: 128,
+        minHeight: 128,
+        maxSizeMessage: 'avatar.too_large',
+        mimeTypesMessage: 'avatar.wrong_type',
+        minWidthMessage: 'avatar.too_small',
+        minHeightMessage: 'avatar.too_small',
+    )]
+    private ?File $avatarFile = null;
+
+    /**
+     * The name of the photo in its storage (config/packages/flysystem.yaml).
+     */
+    #[ORM\Column(length: 255, nullable: true)]
+    private ?string $avatarName = null;
+
+    /**
+     * Changed with the photo: Doctrine sees no change of the user otherwise, and VichUploader
+     * would not store the new one.
+     */
+    #[ORM\Column(nullable: true)]
+    private ?\DateTimeImmutable $updatedAt = null;
 
     public function __construct()
     {
@@ -134,6 +166,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     {
         $data = (array) $this;
         $data["\0" . self::class . "\0password"] = hash('crc32c', $this->password);
+        // An uploaded file cannot be serialized: the session has no use for it.
+        $data["\0" . self::class . "\0avatarFile"] = null;
 
         return $data;
     }
@@ -205,5 +239,37 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
         sort($otherRoles);
 
         return $user->enabled && $this->email === $user->email && $samePassword && $ownRoles === $otherRoles;
+    }
+
+    public function getAvatarFile(): ?File
+    {
+        return $this->avatarFile;
+    }
+
+    public function setAvatarFile(?File $avatarFile): static
+    {
+        $this->avatarFile = $avatarFile;
+        if ($avatarFile !== null) {
+            $this->updatedAt = new \DateTimeImmutable();
+        }
+
+        return $this;
+    }
+
+    public function getAvatarName(): ?string
+    {
+        return $this->avatarName;
+    }
+
+    public function setAvatarName(?string $avatarName): static
+    {
+        $this->avatarName = $avatarName;
+
+        return $this;
+    }
+
+    public function getUpdatedAt(): ?\DateTimeImmutable
+    {
+        return $this->updatedAt;
     }
 }

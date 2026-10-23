@@ -1,0 +1,12 @@
+# The uploaded files go to the Flysystem storages (config/packages/flysystem.yaml).
+# https://github.com/dustin10/VichUploaderBundle/blob/master/docs/index.md
+vich_uploader:
+    db_driver: orm
+    storage: flysystem
+
+    mappings:
+        avatar:
+            upload_destination: avatars.storage
+            namer: Vich\UploaderBundle\Naming\SmartUniqueNamer
+            delete_on_update: true
+            delete_on_remove: true

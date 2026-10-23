@@ -2,7 +2,7 @@
 <twig:DropdownMenu id="user-menu" align="end">
     <twig:DropdownMenu:Trigger>
         <twig:Button variant="ghost" size="sm" {{ ...dropdown_menu_trigger_attrs }}>
-            <twig:ux:icon name="lucide:user-round" aria-hidden="true" />
+            <twig:UserAvatar :user="app.user" size="sm" />
             <span class="max-w-48 truncate max-sm:sr-only">{{ app.user.userIdentifier }}</span>
             <twig:ux:icon name="lucide:chevron-down" aria-hidden="true" />
         </twig:Button>
@@ -10,6 +10,10 @@
     <twig:DropdownMenu:Content class="w-64">
         <twig:DropdownMenu:Label class="truncate">{{ app.user.userIdentifier }}</twig:DropdownMenu:Label>
         <twig:DropdownMenu:Separator />
+        <twig:DropdownMenu:Item as="a" href="{{ path('app_profile') }}">
+            <twig:ux:icon name="lucide:user-round" aria-hidden="true" />
+            {{ 'nav.profile'|trans }}
+        </twig:DropdownMenu:Item>
         {% if is_granted('IS_IMPERSONATOR') %}
             <twig:DropdownMenu:Item as="a" href="{{ impersonation_exit_path(path('admin_user_index')) }}">
                 <twig:ux:icon name="lucide:undo-2" aria-hidden="true" />

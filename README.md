@@ -17,6 +17,8 @@ or with **Use this template** on GitHub.
 - **Users**: login, registration with email verification, password reset, and their
   management by the super admins
 - **Application shell**: collapsible sidebar menu, breadcrumbs and user menu
+- **Files**: VichUploader on Flysystem storages, local or S3 (RustFS in development), with
+  LiipImagine thumbnails: the photo of the profile
 - **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
 - **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
 - **PHPUnit**, **Foundry** and **DAMA Doctrine Test Bundle** for the tests
@@ -53,6 +55,8 @@ trust it (once per machine and volume).
 | `tailwind`  | Rebuilds the CSS when a template changes                              |
 | `database`  | PostgreSQL                                                            |
 | `mailer`    | Mailpit: catches the emails sent in development                       |
+| `storage`   | RustFS, an S3-compatible server: the uploaded files of the development |
+| `storage-init` | Creates the bucket, then exits                                     |
 
 The checkout is bind-mounted in the containers, except `var/`, which is a volume of its own. The
 `messenger` worker keeps the code it started with: `docker compose restart messenger` after a
@@ -71,6 +75,7 @@ Only these ports are published on `127.0.0.1` of the host, set in `.env`:
 | `HTTPS_PORT`      | `8443`  | The application             |
 | `DATABASE_PORT`   | `5432`  | PostgreSQL, for its clients |
 | `MAILER_WEB_PORT` | `8025`  | Mailpit                     |
+| `STORAGE_CONSOLE_PORT` | `9001` | The console of RustFS, at `/rustfs/console/` (keys in `.env.dev`) |
 
 Change them in `.env.local` when another project already uses them: `castor env:init` proposes
 free ones (the ports of this project's own containers count as free) and writes them there,
@@ -113,6 +118,31 @@ development land in Mailpit, at http://localhost:8025.
 - The emails are sent from `MAILER_FROM`, through the `async` Messenger transport.
 - The pages are translated in French (the default locale) and in English (`translations/`).
 - The forms are rendered with the shadcn components (`templates/form/shadcn_layout.html.twig`).
+
+### Profile
+
+At `/profile`, a user uploads, replaces or deletes the photo of their profile, and changes their
+password (with the current one; they stay logged in). The photo shows in the user menu and in
+the administration of the users.
+
+## Files
+
+VichUploader stores the uploaded files on Flysystem storages (`config/packages/flysystem.yaml`).
+Each storage exists twice, on the local disk (`var/storage/`) and on S3, and `STORAGE_ADAPTER`
+chooses between them, at runtime:
+
+| Variable          | What it is                                                         |
+|-------------------|--------------------------------------------------------------------|
+| `STORAGE_ADAPTER` | `local` (`.env`, the tests) or `s3` (`.env.dev`, RustFS)             |
+| `S3_BUCKET`, `S3_REGION` | The bucket                                                  |
+| `S3_ENDPOINT`     | Empty on AWS; the URL of a compatible server (RustFS, Scaleway, OVH...) |
+| `S3_ACCESS_KEY`, `S3_SECRET_KEY` | The keys; without them, the SDK looks for them (IAM role) |
+| `S3_PATH_STYLE`   | `1` for most of the compatible servers                              |
+
+The photos are private: `App\Controller\AvatarController` serves them to the signed-in users only,
+whatever the storage. Their thumbnails (`config/packages/liip_imagine.yaml`: 64 and 256 pixels,
+WebP) are made on the first request, kept in the `avatars_cache.storage`, and removed with the
+photo.
 
 ### Roles and user management
 
@@ -160,6 +190,8 @@ every request through the long-running kernel of FrankenPHP (worker mode). On th
 
 ```shell
 export SERVER_NAME=your-domain.com APP_SECRET=… POSTGRES_PASSWORD=… MAILER_DSN=… MAILER_FROM=…
+# The uploaded files: in the app_storage volume by default, or on S3
+export STORAGE_ADAPTER=s3 S3_BUCKET=… S3_REGION=… S3_ACCESS_KEY=… S3_SECRET_KEY=…
 docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
 docker compose -f compose.yaml -f compose.prod.yaml exec php bin/console doctrine:migrations:migrate --no-interaction
 ```

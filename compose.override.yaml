@@ -27,6 +27,9 @@ services:
     ports:
       # HTTPS only: the redirection of HTTP to HTTPS would lose the port of the host.
       - "127.0.0.1:${HTTPS_PORT:-8443}:443"
+    depends_on:
+      storage-init:
+        condition: service_completed_successfully
 
   # Sends the emails queued in the "async" transport. Restarted after an hour, to take the changes
   # of the code (or now: docker compose restart messenger).
@@ -60,6 +63,39 @@ services:
       - "127.0.0.1:${DATABASE_PORT:-5432}:5432"
 ###< doctrine/doctrine-bundle ###
 
+  # RustFS, an S3-compatible server: the uploaded files of the development (STORAGE_ADAPTER=s3).
+  storage:
+    image: rustfs/rustfs:1.0.3
+    environment:
+      RUSTFS_ACCESS_KEY: ${S3_ACCESS_KEY}
+      RUSTFS_SECRET_KEY: ${S3_SECRET_KEY}
+      RUSTFS_CONSOLE_ENABLE: "true"
+    volumes:
+      - storage_data:/data
+    ports:
+      # The web console, with the keys of .env.dev.
+      - "127.0.0.1:${STORAGE_CONSOLE_PORT:-9001}:9001"
+    healthcheck:
+      test: ["CMD-SHELL", "curl -fs http://localhost:9000/health || exit 1"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
+
+  # Creates the bucket, once RustFS is up, then exits.
+  storage-init:
+    image: amazon/aws-cli:2.38.5
+    environment:
+      AWS_ACCESS_KEY_ID: ${S3_ACCESS_KEY}
+      AWS_SECRET_ACCESS_KEY: ${S3_SECRET_KEY}
+      AWS_DEFAULT_REGION: ${S3_REGION}
+    entrypoint: ["sh", "-c"]
+    command: ["aws --endpoint-url http://storage:9000 s3api head-bucket --bucket ${S3_BUCKET} 2>/dev/null || aws --endpoint-url http://storage:9000 s3 mb s3://${S3_BUCKET}"]
+    restart: "no"
+    depends_on:
+      storage:
+        condition: service_healthy
+
 ###> symfony/mailer ###
   mailer:
     image: axllent/mailpit
@@ -72,3 +108,4 @@ services:
 
 volumes:
   app_var:
+  storage_data:

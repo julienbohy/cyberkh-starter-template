@@ -9,6 +9,12 @@ password:
     too_weak: This password is too easy to guess.
     compromised: This password appeared in a data breach, choose another one.
     mismatch: The two passwords do not match.
+    current_wrong: This is not your current password.
 
 registration:
     agree_terms: You must agree to the terms of use.
+
+avatar:
+    too_large: The photo is larger than 2 MB.
+    wrong_type: The photo must be a JPEG, PNG or WebP image.
+    too_small: The photo must be at least 128 × 128 pixels.

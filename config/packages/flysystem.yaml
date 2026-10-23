@@ -1,0 +1,36 @@
+# The files of the application. Each storage exists on the local disk and on S3: its lazy storage
+# picks the one that STORAGE_ADAPTER names (local or s3), at runtime.
+# https://github.com/thephpleague/flysystem-bundle
+flysystem:
+    storages:
+        # The photos of the users, as they were uploaded (VichUploader).
+        avatars.storage.local:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/%kernel.environment%/avatars'
+        avatars.storage.s3:
+            adapter: 'aws'
+            options:
+                client: 'app.s3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'avatars'
+        avatars.storage:
+            adapter: 'lazy'
+            options:
+                source: 'avatars.storage.%env(STORAGE_ADAPTER)%'
+
+        # Their thumbnails (LiipImagine), made on the first request.
+        avatars_cache.storage.local:
+            adapter: 'local'
+            options:
+                directory: '%kernel.project_dir%/var/storage/%kernel.environment%/avatars-cache'
+        avatars_cache.storage.s3:
+            adapter: 'aws'
+            options:
+                client: 'app.s3_client'
+                bucket: '%env(S3_BUCKET)%'
+                prefix: 'avatars-cache'
+        avatars_cache.storage:
+            adapter: 'lazy'
+            options:
+                source: 'avatars_cache.storage.%env(STORAGE_ADAPTER)%'

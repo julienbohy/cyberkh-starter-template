@@ -24,6 +24,7 @@ function ports(): array
         'HTTPS_PORT' => 'the application (HTTPS)',
         'DATABASE_PORT' => 'PostgreSQL',
         'MAILER_WEB_PORT' => 'Mailpit',
+        'STORAGE_CONSOLE_PORT' => 'the console of RustFS (S3)',
     ];
 }
 

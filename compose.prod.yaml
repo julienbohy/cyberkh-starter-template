@@ -9,6 +9,14 @@ x-app-prod-environment: &app-prod-environment
   MAILER_DSN: ${MAILER_DSN:?MAILER_DSN is required}
   MAILER_FROM: ${MAILER_FROM:?MAILER_FROM is required}
   DEFAULT_URI: https://${SERVER_NAME:-localhost}
+  # The uploaded files: in the app_storage volume (local), or on S3.
+  STORAGE_ADAPTER: ${STORAGE_ADAPTER:-local}
+  S3_BUCKET: ${S3_BUCKET:-app}
+  S3_REGION: ${S3_REGION:-us-east-1}
+  S3_ENDPOINT: ${S3_ENDPOINT:-}
+  S3_ACCESS_KEY: ${S3_ACCESS_KEY:-}
+  S3_SECRET_KEY: ${S3_SECRET_KEY:-}
+  S3_PATH_STYLE: ${S3_PATH_STYLE:-0}
 
 services:
   php:
@@ -17,6 +25,8 @@ services:
       target: frankenphp_prod
     environment:
       <<: *app-prod-environment
+    volumes:
+      - app_storage:/app/var/storage
     ports:
       - "80:80"
       - "443:443"
@@ -32,8 +42,13 @@ services:
     command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600"]
     environment:
       <<: *app-prod-environment
+    volumes:
+      - app_storage:/app/var/storage
     healthcheck:
       disable: true
     depends_on:
       database:
         condition: service_healthy
+
+volumes:
+  app_storage:
