@@ -1,0 +1,39 @@
+# The production: the prod image, which holds the code, the dependencies and the assets.
+#   docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
+# APP_SECRET, POSTGRES_PASSWORD, SERVER_NAME (your domain), MAILER_DSN and MAILER_FROM come from
+# the environment of the host: Caddy gets the HTTPS certificate of SERVER_NAME on its own.
+
+x-app-prod-environment: &app-prod-environment
+  APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
+  DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-18}&charset=utf8
+  MAILER_DSN: ${MAILER_DSN:?MAILER_DSN is required}
+  MAILER_FROM: ${MAILER_FROM:?MAILER_FROM is required}
+  DEFAULT_URI: https://${SERVER_NAME:-localhost}
+
+services:
+  php:
+    build:
+      context: .
+      target: frankenphp_prod
+    environment:
+      <<: *app-prod-environment
+    ports:
+      - "80:80"
+      - "443:443"
+      # HTTP/3
+      - "443:443/udp"
+
+  messenger:
+    build:
+      context: .
+      target: frankenphp_prod
+    restart: unless-stopped
+    entrypoint: ["docker-php-entrypoint"]
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600"]
+    environment:
+      <<: *app-prod-environment
+    healthcheck:
+      disable: true
+    depends_on:
+      database:
+        condition: service_healthy

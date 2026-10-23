@@ -21,9 +21,9 @@ use function stack\docker_compose;
 function ports(): array
 {
     return [
+        'HTTPS_PORT' => 'the application (HTTPS)',
         'DATABASE_PORT' => 'PostgreSQL',
-        'MAILER_SMTP_PORT' => 'Mailpit (SMTP)',
-        'MAILER_WEB_PORT' => 'Mailpit (web UI)',
+        'MAILER_WEB_PORT' => 'Mailpit',
     ];
 }
 

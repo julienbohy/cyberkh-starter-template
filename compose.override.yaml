@@ -1,9 +1,62 @@
-# Fixed host ports, so that the URLs of .env work even when the Symfony CLI does not see Docker.
-# Set in .env, and in .env.local to change them: `castor stack:start` passes both to Docker Compose.
+# The development: the checkout is bind-mounted in the containers, which run the dev image.
+# The host ports are set in .env, and in .env.local to change them (`castor env:init`):
+# `castor stack:start` passes both to Docker Compose.
+
+x-app-dev: &app-dev
+  build:
+    context: .
+    target: frankenphp_dev
+  volumes:
+    - ./:/app
+    # Kept off the bind mount: the cache of the container is its own, and faster on macOS.
+    - app_var:/app/var
+  environment:
+    XDEBUG_MODE: ${XDEBUG_MODE:-off}
+  extra_hosts:
+    # Xdebug connects to the IDE of the host.
+    - host.docker.internal:host-gateway
+
 services:
+  php:
+    <<: *app-dev
+    volumes:
+      - ./:/app
+      - app_var:/app/var
+      - caddy_data:/data
+      - caddy_config:/config
+    ports:
+      # HTTPS only: the redirection of HTTP to HTTPS would lose the port of the host.
+      - "127.0.0.1:${HTTPS_PORT:-8443}:443"
+
+  # Sends the emails queued in the "async" transport. Restarted after an hour, to take the changes
+  # of the code (or now: docker compose restart messenger).
+  messenger:
+    <<: *app-dev
+    restart: unless-stopped
+    entrypoint: ["docker-php-entrypoint"]
+    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600"]
+    healthcheck:
+      disable: true
+    depends_on:
+      php:
+        condition: service_healthy
+
+  # Rebuilds the CSS when a template changes.
+  tailwind:
+    <<: *app-dev
+    restart: unless-stopped
+    entrypoint: ["docker-php-entrypoint"]
+    command: ["php", "bin/console", "tailwind:build", "--watch"]
+    healthcheck:
+      disable: true
+    depends_on:
+      php:
+        condition: service_healthy
+
 ###> doctrine/doctrine-bundle ###
   database:
     ports:
+      # For the database clients of the host.
       - "127.0.0.1:${DATABASE_PORT:-5432}:5432"
 ###< doctrine/doctrine-bundle ###
 
@@ -11,9 +64,11 @@ services:
   mailer:
     image: axllent/mailpit
     ports:
-      - "127.0.0.1:${MAILER_SMTP_PORT:-1025}:1025"
       - "127.0.0.1:${MAILER_WEB_PORT:-8025}:8025"
     environment:
       MP_SMTP_AUTH_ACCEPT_ANY: 1
       MP_SMTP_AUTH_ALLOW_INSECURE: 1
 ###< symfony/mailer ###
+
+volumes:
+  app_var:

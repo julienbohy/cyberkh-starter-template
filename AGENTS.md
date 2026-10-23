@@ -63,8 +63,8 @@ Three specifics worth spelling out, because they are easy to get wrong:
 
 ## Everyday workflow
 
-- Run the app with `symfony serve -d`, and commands with `symfony console ...`
-  (or `bin/console` when the Symfony CLI isn't available).
+- The app runs in Docker: start it with `castor stack:start`, and run commands in the
+  php container with `castor app:console ...` and `castor app:composer ...`.
 - When something fails, read `var/log/dev.log` and the web profiler
   (`/_profiler`) before changing code.
 - If `maker-bundle` is installed, prefer `bin/console make:*` with every argument

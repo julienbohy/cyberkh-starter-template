@@ -2,26 +2,43 @@
 
 declare(strict_types=1);
 
-// The application as a whole: its installation.
+// The application as a whole: its installation, and its console and Composer, in the php container.
 
 namespace app;
 
+use Castor\Attribute\AsRawTokens;
 use Castor\Attribute\AsTask;
 
 use function Castor\run;
+use function stack\php;
 
-#[AsTask(description: 'Install the dependencies and the Git hooks, start the stack and run the migrations')]
+#[AsTask(description: 'Choose the ports, start the stack, install the dependencies and run the migrations')]
 function install(): void
 {
-    run(['symfony', 'composer', 'install']);
-    // Composer installs the hooks only with GrumPHP itself: not in a project created before its Git repository.
-    run(['symfony', 'php', 'vendor/bin/grumphp', 'git:init']);
-
     // The first install chooses the ports, before the containers take them.
     if (! is_file('.env.local')) {
         \env\init();
     }
 
     \stack\start();
-    run(['symfony', 'console', 'doctrine:migrations:migrate', '--no-interaction', '--allow-no-migration']);
+    run(php('composer', 'install', '--no-interaction'));
+    run(php('php', 'bin/console', 'doctrine:migrations:migrate', '--no-interaction', '--allow-no-migration'));
+}
+
+/**
+ * @param list<string> $arguments
+ */
+#[AsTask(description: 'Run a command of the Symfony console, e.g. castor app:console debug:router')]
+function console(#[AsRawTokens] array $arguments = []): void
+{
+    run(php('php', 'bin/console', ...$arguments));
+}
+
+/**
+ * @param list<string> $arguments
+ */
+#[AsTask(description: 'Run Composer, e.g. castor app:composer require symfony/lock')]
+function composer(#[AsRawTokens] array $arguments = []): void
+{
+    run(php('composer', ...$arguments));
 }

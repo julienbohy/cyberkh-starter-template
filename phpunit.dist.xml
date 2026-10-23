@@ -15,7 +15,7 @@
         <ini name="error_reporting" value="-1" />
         <server name="APP_ENV" value="test" force="true" />
         <server name="SHELL_VERBOSITY" value="-1" />
-        <!-- Over the Mailpit DSN that the Symfony CLI exposes: the tests send no real email. -->
+        <!-- Over any MAILER_DSN of the environment: the tests send no real email. -->
         <server name="MAILER_DSN" value="null://null" force="true" />
     </php>
 

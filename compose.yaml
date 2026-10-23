@@ -1,5 +1,21 @@
-
+# The services of the application, in dev and in prod. compose.override.yaml adds the dev ones
+# (Compose reads it on its own), compose.prod.yaml the prod ones:
+#   docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
 services:
+  php:
+    build:
+      context: .
+    restart: unless-stopped
+    environment:
+      SERVER_NAME: ${SERVER_NAME:-localhost}
+    depends_on:
+      database:
+        condition: service_healthy
+    volumes:
+      # The certificates and the local CA of Caddy.
+      - caddy_data:/data
+      - caddy_config:/config
+
 ###> doctrine/doctrine-bundle ###
   database:
     image: postgres:${POSTGRES_VERSION:-18}-alpine
@@ -20,6 +36,8 @@ services:
 ###< doctrine/doctrine-bundle ###
 
 volumes:
+  caddy_data:
+  caddy_config:
 ###> doctrine/doctrine-bundle ###
   database_data:
 ###< doctrine/doctrine-bundle ###

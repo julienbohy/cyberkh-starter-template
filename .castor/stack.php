@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-// The running stack: the Docker services (compose.yaml) and the web server of the Symfony CLI.
+// The running stack: the Docker services of compose.yaml and compose.override.yaml.
 
 namespace stack;
 
@@ -10,20 +10,41 @@ use Castor\Attribute\AsTask;
 
 use function Castor\io;
 use function Castor\run;
+use function env\current_port;
 
-#[AsTask(description: 'Start the Docker services and the web server')]
+#[AsTask(description: 'Build the images if needed, then start the Docker services')]
 function start(): void
 {
-    run(docker_compose('up', '--detach', '--wait'));
-    run(['symfony', 'server:start', '--daemon']);
-    io()->success('The application is running: run "symfony open:local" to open it.');
+    run(docker_compose('up', '--detach', '--wait', '--build'));
+    io()->success(\sprintf('The application is running at https://localhost:%d (Mailpit: http://localhost:%d).', current_port('HTTPS_PORT'), current_port('MAILER_WEB_PORT')));
 }
 
-#[AsTask(description: 'Stop the web server and the Docker services')]
+#[AsTask(description: 'Stop the Docker services')]
 function stop(): void
 {
-    run(['symfony', 'server:stop']);
     run(docker_compose('stop'));
+}
+
+#[AsTask(description: 'Make macOS trust the local HTTPS certificates of Caddy (asks for your password)')]
+function trust(): void
+{
+    $certificate = 'var/caddy-root.crt';
+    run(docker_compose('cp', 'php:/data/caddy/pki/authorities/local/root.crt', $certificate));
+    run(['sudo', 'security', 'add-trusted-cert', '-d', '-r', 'trustRoot', '-k', '/Library/Keychains/System.keychain', $certificate]);
+    io()->success('macOS trusts the certificates of https://localhost now: restart your browser.');
+}
+
+/**
+ * A command run in the php container, where the application lives.
+ *
+ * @return list<string>
+ */
+function php(string ...$command): array
+{
+    // Without a terminal (a script, the CI), Docker must not allocate one.
+    $tty = stream_isatty(\STDIN) ? [] : ['-T'];
+
+    return docker_compose('exec', ...$tty, ...['php'], ...array_values($command));
 }
 
 /**

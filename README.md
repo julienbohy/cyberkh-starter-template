@@ -1,16 +1,17 @@
 # Cyberkh Starter Template
 
-A Symfony starter template. Create a new project from it with the Symfony CLI:
+A Symfony starter template, served by FrankenPHP in Docker. Create a new project from it with
+the Symfony CLI (and PHP 8.5, for this step only):
 
 ```shell
-symfony new my-project --skeleton=julienbohy/cyberkh-starter-template
+symfony new my-project --skeleton=julienbohy/cyberkh-starter-template --php=8.5
 ```
 
 or with **Use this template** on GitHub.
 
 ## Stack
 
-- **PHP 8.5** (`.php-version`) and **Symfony 8.1**
+- **PHP 8.5** and **Symfony 8.1**, served by **FrankenPHP** (Caddy, HTTPS), in Docker
 - **Doctrine ORM** with migrations, on **PostgreSQL 18**
 - **Messenger** (Doctrine transport), **Mailer**, **Notifier**
 - **Users**: login, registration with email verification, password reset, and their
@@ -19,71 +20,83 @@ or with **Use this template** on GitHub.
 - **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
 - **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
 - **PHPUnit**, **Foundry** and **DAMA Doctrine Test Bundle** for the tests
-- **PHPStan** (level max), **ECS**, **Twig-CS-Fixer** and **GrumPHP** for the quality
+- **PHPStan** (level max), **ECS** and **Twig-CS-Fixer** for the quality
 
 ## Requirements
 
-- [Symfony CLI](https://symfony.com/download)
-- PHP 8.5, with the `pdo_pgsql` and `intl` extensions
 - Docker with Docker Compose
 - [Castor](https://castor.jolicode.com)
+
+The application runs in the containers: the host needs neither PHP nor Composer.
 
 ## Getting started
 
 ```shell
 castor app:install
 castor db:reset
-symfony open:local
 ```
 
-`castor app:install` installs the dependencies, asks for the ports of the Docker services (see
-below), starts them (PostgreSQL, Mailpit) and the web server, then runs the migrations. `castor db:reset` loads the development data:
-log in with `admin@example.com` (super admin) or `user@example.com`, and the password
-`correct-horse-battery-staple`.
+`castor app:install` asks for the ports of the host (see below), builds the image, starts the
+Docker services, installs the dependencies and runs the migrations. `castor db:reset` loads the
+development data. Then open https://localhost:8443 and log in with `admin@example.com` (super
+admin) or `user@example.com`, and the password `correct-horse-battery-staple`.
 
-The web server also runs two workers (`.symfony.local.yaml`): the Messenger consumer, which
-sends the emails, and the Tailwind watcher.
+The HTTPS certificate comes from the local authority of Caddy: `castor stack:trust` makes macOS
+trust it (once per machine and volume).
 
-Every command goes through the Symfony CLI, which uses the PHP version of `.php-version`.
+### The Docker services
+
+| Service     | What it does                                                          |
+|-------------|-----------------------------------------------------------------------|
+| `php`       | FrankenPHP: serves the application, over HTTPS                        |
+| `messenger` | Sends the emails queued in the `async` transport                      |
+| `tailwind`  | Rebuilds the CSS when a template changes                              |
+| `database`  | PostgreSQL                                                            |
+| `mailer`    | Mailpit: catches the emails sent in development                       |
+
+The checkout is bind-mounted in the containers, except `var/`, which is a volume of its own. The
+`messenger` worker keeps the code it started with: `docker compose restart messenger` after a
+change of a message handler (it restarts on its own after an hour).
+
+The image is built by the `Dockerfile`: `frankenphp_dev` for the development (Xdebug, with
+`XDEBUG_MODE=debug` in `.env.local`), `frankenphp_prod` for the production (see below).
 
 ### Ports
 
-The Docker services listen on fixed ports of `127.0.0.1`, set in `.env` and read by Docker Compose
-too:
+The application reaches the services inside the Docker network (`database:5432`, `mailer:1025`).
+Only these ports are published on `127.0.0.1` of the host, set in `.env`:
 
-| Variable           | Default | Service           |
-|--------------------|---------|-------------------|
-| `DATABASE_PORT`    | `5432`  | PostgreSQL        |
-| `MAILER_SMTP_PORT` | `1025`  | Mailpit (SMTP)    |
-| `MAILER_WEB_PORT`  | `8025`  | Mailpit (web UI)  |
+| Variable          | Default | Service                     |
+|-------------------|---------|-----------------------------|
+| `HTTPS_PORT`      | `8443`  | The application             |
+| `DATABASE_PORT`   | `5432`  | PostgreSQL, for its clients |
+| `MAILER_WEB_PORT` | `8025`  | Mailpit                     |
 
 Change them in `.env.local` when another project already uses them: `castor env:init` proposes
 free ones (the ports of this project's own containers count as free) and writes them there,
-keeping the other lines of the file. Then run `castor stack:start` again. Docker Compose alone reads `.env` only: the Castor tasks give it the `.env` files of the
-dev environment, in the order of Symfony (`.env`, `.env.local`, `.env.dev`, `.env.dev.local`).
-Run `docker compose` through `castor stack:start` and `castor stack:stop`, or pass these files yourself with
-`--env-file`.
-
-The Castor tasks also give the Symfony CLI the socket of the active Docker context (Docker
-Desktop, OrbStack, Colima...), unless `DOCKER_HOST` is set.
+keeping the other lines of the file. Then run `castor stack:start` again. Docker Compose alone
+reads `.env` only: the Castor tasks give it the `.env` files of the dev environment, in the order
+of Symfony (`.env`, `.env.local`, `.env.dev`, `.env.dev.local`). Run `docker compose` through
+Castor, or pass these files yourself with `--env-file`.
 
 ## Daily tasks
 
-| Task                 | What it does                                                    |
-|----------------------|-----------------------------------------------------------------|
-| `castor app:install` | Install everything and start the stack (first checkout)         |
-| `castor stack:start` | Start the Docker services and the web server                    |
-| `castor stack:stop`  | Stop the web server and the Docker services                     |
-| `castor env:init`    | Choose the ports of the Docker services, in `.env.local`        |
-| `castor db:reset`    | Empty and migrate the database, then load the fixtures          |
-| `castor qa:lint`     | Run all the static checks (`composer lint`)                     |
-| `castor qa:fix`      | Apply the coding standard fixes (`composer fix`)                |
-| `castor qa:test`     | Run the test suite                                              |
+| Task                   | What it does                                                    |
+|------------------------|-----------------------------------------------------------------|
+| `castor app:install`   | Install everything and start the stack (first checkout)         |
+| `castor app:console …` | Run a command of the Symfony console, in the container          |
+| `castor app:composer …`| Run Composer, in the container                                  |
+| `castor stack:start`   | Build the image if needed, then start the Docker services       |
+| `castor stack:stop`    | Stop the Docker services                                        |
+| `castor stack:trust`   | Make macOS trust the local HTTPS certificates                   |
+| `castor env:init`      | Choose the ports of the host, in `.env.local`                   |
+| `castor db:reset`      | Empty and migrate the database, then load the fixtures          |
+| `castor qa:lint`       | Run all the static checks (`composer lint`)                     |
+| `castor qa:fix`        | Apply the coding standard fixes (`composer fix`)                |
+| `castor qa:test`       | Run the test suite                                              |
 
-The tasks are in `.castor/`, one file per prefix; `castor.php` imports them and gives the
-Symfony CLI the Docker socket.
-
-The mails sent in development land in Mailpit: `symfony open:local:webmail`.
+The tasks are in `.castor/`, one file per prefix; `castor.php` imports them. The mails sent in
+development land in Mailpit, at http://localhost:8025.
 
 ## Users
 
@@ -118,7 +131,7 @@ A super admin cannot change their own roles, disable or delete their own account
 Create the first super admin with:
 
 ```shell
-symfony console app:user:create admin@your-domain.com --super-admin
+castor app:console app:user:create admin@your-domain.com --super-admin
 ```
 
 ## Application shell
@@ -136,13 +149,27 @@ registration, password reset) extend `layout/auth.html.twig`.
 
 ## Quality
 
-GrumPHP runs ECS, PHPStan, Twig-CS-Fixer, the Composer validation and the YAML lint on the
-staged files before each commit. `castor app:install` installs its Git hooks.
+`castor qa:lint` runs every static check: the linters of Symfony (container, YAML, Twig), ECS,
+PHPStan, Twig-CS-Fixer and the audits of Composer and of the importmap. `castor qa:fix` applies
+the fixes of ECS and Twig-CS-Fixer.
+
+## Production
+
+The `frankenphp_prod` image holds the code, the dependencies and the compiled assets, and serves
+every request through the long-running kernel of FrankenPHP (worker mode). On the server:
+
+```shell
+export SERVER_NAME=your-domain.com APP_SECRET=… POSTGRES_PASSWORD=… MAILER_DSN=… MAILER_FROM=…
+docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
+docker compose -f compose.yaml -f compose.prod.yaml exec php bin/console doctrine:migrations:migrate --no-interaction
+```
+
+Caddy gets the HTTPS certificate of `SERVER_NAME` on its own.
 
 ## After creating a project from the template
 
 - Rename the project in this README (and in `composer.json` with **Use this template**: Flex removes the name)
-- Change the database credentials, and set the `APP_SECRET` of production with `symfony console secrets:set`
+- Change the database credentials, and set the `APP_SECRET` of production in its environment (or with `bin/console secrets:set`)
 - Set `MAILER_FROM` and the application name (`app.name` in `translations/`)
 - Choose a license: Symfony Flex removes `LICENSE` and makes the project `proprietary`
 
