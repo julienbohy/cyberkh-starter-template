@@ -1,0 +1,45 @@
+{#- The shell of the signed-in pages: sidebar, top bar and breadcrumbs around the page. -#}
+{%- props
+    ## list<array{label: string, url?: string}> The breadcrumbs after the dashboard; the last item is the current page.
+    breadcrumbs = [],
+    ## boolean Whether the sidebar is expanded.
+    open = true
+-%}
+{#- Captured here, at the top level, where `content` is the block of the host page. -#}
+{%- set _shell_content -%}
+    {% block content %}{% endblock %}
+{%- endset -%}
+<twig:Sidebar:Provider id="app-shell" :defaultOpen="open">
+    <twig:Sidebar :label="'nav.main'|trans">
+        <twig:Sidebar:Header>
+            <a href="{{ path('app_home') }}" class="flex h-8 items-center gap-2 px-2 font-semibold">
+                <twig:ux:icon name="lucide:box" class="size-5 shrink-0" aria-hidden="true" />
+                <span class="truncate group-data-[collapsible=icon]:hidden">{{ 'app.name'|trans }}</span>
+            </a>
+        </twig:Sidebar:Header>
+        <twig:Sidebar:Content>
+            <twig:AppShell:Navigation />
+        </twig:Sidebar:Content>
+        <twig:Sidebar:Rail />
+    </twig:Sidebar>
+    <twig:Sidebar:Inset>
+        <header class="sticky top-0 z-10 flex h-14 items-center gap-3 border-b bg-background px-4">
+            <twig:Sidebar:Trigger class="-ml-1 size-8" :label="'nav.toggle_sidebar'|trans">
+                <twig:ux:icon name="lucide:panel-left" aria-hidden="true" />
+            </twig:Sidebar:Trigger>
+            <div class="min-w-0 flex-1">
+                <twig:AppShell:Breadcrumbs :items="breadcrumbs" />
+            </div>
+            <twig:AppShell:UserMenu />
+        </header>
+        {% if is_granted('IS_IMPERSONATOR') %}
+            <div class="flex flex-wrap items-center justify-center gap-x-3 gap-y-1 border-b bg-muted px-4 py-2 text-sm">
+                <span>{{ 'nav.impersonating'|trans({'%email%': app.user.userIdentifier}) }}</span>
+                <a href="{{ impersonation_exit_path(path('admin_user_index')) }}" class="font-medium underline underline-offset-4">{{ 'nav.exit_impersonation'|trans }}</a>
+            </div>
+        {% endif %}
+        <div class="mx-auto w-full max-w-5xl px-4 py-8">
+            {{ _shell_content }}
+        </div>
+    </twig:Sidebar:Inset>
+</twig:Sidebar:Provider>

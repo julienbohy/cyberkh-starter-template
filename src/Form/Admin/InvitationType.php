@@ -1,0 +1,49 @@
+<?php
+
+declare(strict_types=1);
+
+namespace App\Form\Admin;
+
+use App\Entity\User;
+use App\Security\Role;
+use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
+use Symfony\Component\Form\Extension\Core\Type\EnumType;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
+
+/**
+ * A user invited by a super admin: they choose their password from the link of the invitation.
+ *
+ * @extends AbstractType<User>
+ */
+final class InvitationType extends AbstractType
+{
+    public function buildForm(FormBuilderInterface $builder, array $options): void
+    {
+        $builder
+            ->add('email', EmailType::class, [
+                'label' => 'admin.user.form.email',
+                'attr' => [
+                    'autocomplete' => 'off',
+                    'placeholder' => 'registration.form.email_placeholder',
+                ],
+            ])
+            ->add('grantedRoles', EnumType::class, [
+                'class' => Role::class,
+                'choice_label' => static fn(Role $role): string => $role->label(),
+                'multiple' => true,
+                'expanded' => true,
+                'label' => 'admin.user.form.roles',
+                'help' => 'admin.user.form.roles_help',
+            ])
+        ;
+    }
+
+    public function configureOptions(OptionsResolver $resolver): void
+    {
+        $resolver->setDefaults([
+            'data_class' => User::class,
+        ]);
+    }
+}

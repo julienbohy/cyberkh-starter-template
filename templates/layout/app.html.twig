@@ -1,0 +1,15 @@
+{#- The pages of the signed-in users, in the application shell (sidebar, top bar, breadcrumbs).
+    A page sets `breadcrumbs`: the items after the dashboard, the last one being the page itself,
+    e.g. `{% set breadcrumbs = [{label: 'admin.user.index.title'|trans}] %}` after `extends`. -#}
+{% extends 'base.html.twig' %}
+
+{% block layout %}
+    {#- Blocks cannot be overridden inside a component tag: the page is captured first. -#}
+    {% set _page %}
+        {{ include('layout/_flashes.html.twig') }}
+        {% block body %}{% endblock %}
+    {% endset %}
+    <twig:AppShell :breadcrumbs="breadcrumbs|default([])" :open="app.request.cookies.get('sidebar:state') != 'collapsed'">
+        {{ _page }}
+    </twig:AppShell>
+{% endblock %}

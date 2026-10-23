@@ -1,0 +1,92 @@
+{% extends 'layout/app.html.twig' %}
+
+{% set breadcrumbs = [
+    {label: 'admin.user.index.title'|trans, url: path('admin_user_index')},
+    {label: user.email},
+] %}
+
+{% block title %}{{ user.email }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        <div class="flex flex-wrap items-center gap-3">
+            <h1 class="text-2xl font-semibold">{{ user.email }}</h1>
+            {{ include('admin/user/_status.html.twig') }}
+        </div>
+        <p class="text-sm text-muted-foreground">{{ 'admin.user.edit.created_at'|trans({'%date%': user.createdAt|format_datetime('medium', 'short')}) }}</p>
+
+        <div class="grid items-start gap-6 lg:grid-cols-2">
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title><h2>{{ 'admin.user.edit.account'|trans }}</h2></twig:Card:Title>
+                    {% if own_account %}
+                        <twig:Card:Description>{{ 'admin.user.edit.own_account'|trans }}</twig:Card:Description>
+                    {% endif %}
+                </twig:Card:Header>
+                <twig:Card:Content>
+                    {{ form_start(form, {attr: {class: 'space-y-6'}}) }}
+                        {{ form_errors(form) }}
+                        {{ form_row(form.grantedRoles) }}
+                        {{ form_row(form.enabled) }}
+                        {{ form_row(form.isVerified) }}
+
+                        <twig:Button type="submit">{{ 'admin.user.edit.submit'|trans }}</twig:Button>
+                    {{ form_end(form) }}
+                </twig:Card:Content>
+            </twig:Card>
+
+            <twig:Card>
+                <twig:Card:Header>
+                    <twig:Card:Title><h2>{{ 'admin.user.edit.actions'|trans }}</h2></twig:Card:Title>
+                </twig:Card:Header>
+                <twig:Card:Content class="space-y-6">
+                    <form method="post" action="{{ path('admin_user_password_link', {id: user.id}) }}" class="space-y-2">
+                        <input type="hidden" name="_token" value="{{ csrf_token('password-link-' ~ user.id) }}">
+                        <p class="text-sm text-muted-foreground">{{ 'admin.user.edit.password_link_help'|trans }}</p>
+                        <twig:Button type="submit" variant="outline">
+                            <twig:ux:icon name="lucide:mail" aria-hidden="true" />
+                            {{ 'admin.user.edit.password_link'|trans }}
+                        </twig:Button>
+                    </form>
+
+                    {% if not own_account %}
+                        {% if user.enabled and user.verified %}
+                            <div class="space-y-2">
+                                <p class="text-sm text-muted-foreground">{{ 'admin.user.edit.impersonate_help'|trans }}</p>
+                                <twig:Button as="a" href="{{ path('app_home', {_switch_user: user.email}) }}" variant="outline">
+                                    <twig:ux:icon name="lucide:venetian-mask" aria-hidden="true" />
+                                    {{ 'admin.user.edit.impersonate'|trans }}
+                                </twig:Button>
+                            </div>
+                        {% endif %}
+
+                        <div class="space-y-2">
+                            <p class="text-sm text-muted-foreground">{{ 'admin.user.edit.delete_help'|trans }}</p>
+                            <twig:AlertDialog id="delete-user">
+                                <twig:AlertDialog:Trigger>
+                                    <twig:Button variant="destructive" {{ ...alert_dialog_trigger_attrs }}>
+                                        <twig:ux:icon name="lucide:trash-2" aria-hidden="true" />
+                                        {{ 'admin.user.edit.delete'|trans }}
+                                    </twig:Button>
+                                </twig:AlertDialog:Trigger>
+                                <twig:AlertDialog:Content>
+                                    <twig:AlertDialog:Header>
+                                        <twig:AlertDialog:Title>{{ 'admin.user.delete.title'|trans }}</twig:AlertDialog:Title>
+                                        <twig:AlertDialog:Description>{{ 'admin.user.delete.description'|trans({'%email%': user.email}) }}</twig:AlertDialog:Description>
+                                    </twig:AlertDialog:Header>
+                                    <form method="post" action="{{ path('admin_user_delete', {id: user.id}) }}">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete-' ~ user.id) }}">
+                                        <twig:AlertDialog:Footer>
+                                            <twig:AlertDialog:Cancel>{{ 'admin.user.delete.cancel'|trans }}</twig:AlertDialog:Cancel>
+                                            <twig:AlertDialog:Action type="submit" variant="destructive">{{ 'admin.user.delete.confirm'|trans }}</twig:AlertDialog:Action>
+                                        </twig:AlertDialog:Footer>
+                                    </form>
+                                </twig:AlertDialog:Content>
+                            </twig:AlertDialog>
+                        </div>
+                    {% endif %}
+                </twig:Card:Content>
+            </twig:Card>
+        </div>
+    </div>
+{% endblock %}

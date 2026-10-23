@@ -1,0 +1,45 @@
+{#- The sidebar menu. A feature adds its entries here, in a group of its own:
+    - `label`: a translation key; `routes`: the route-name prefixes of the pages of the entry,
+      which is active on all of them;
+    - `granted`: the role (or attribute) required to see the entry, if any. A group without a
+      visible entry is not shown. -#}
+{%- set groups = [
+    {
+        label: null,
+        entries: [
+            {label: 'nav.dashboard', route: 'app_home', icon: 'lucide:layout-dashboard', routes: ['app_home']},
+        ],
+    },
+    {
+        label: 'nav.administration',
+        entries: [
+            {label: 'nav.users', route: 'admin_user_index', icon: 'lucide:users', routes: ['admin_user_'], granted: 'ROLE_SUPER_ADMIN'},
+        ],
+    },
+] -%}
+{%- set current_route = app.request.attributes.get('_route') ?? '' -%}
+<nav aria-label="{{ 'nav.main'|trans }}" class="flex min-h-0 flex-1 flex-col gap-2">
+    {% for group in groups %}
+        {% set entries = group.entries|filter(entry => entry.granted is not defined or is_granted(entry.granted)) %}
+        {% if entries is not empty %}
+            <twig:Sidebar:Group>
+                {% if group.label %}
+                    <twig:Sidebar:GroupLabel>{{ group.label|trans }}</twig:Sidebar:GroupLabel>
+                {% endif %}
+                <twig:Sidebar:GroupContent>
+                    <twig:Sidebar:Menu>
+                        {% for entry in entries %}
+                            {% set active = entry.routes|filter(prefix => current_route starts with prefix) is not empty %}
+                            <twig:Sidebar:MenuItem>
+                                <twig:Sidebar:MenuButton as="a" href="{{ path(entry.route) }}" :active="active" :tooltip="entry.label|trans">
+                                    <twig:ux:icon name="{{ entry.icon }}" aria-hidden="true" />
+                                    <span>{{ entry.label|trans }}</span>
+                                </twig:Sidebar:MenuButton>
+                            </twig:Sidebar:MenuItem>
+                        {% endfor %}
+                    </twig:Sidebar:Menu>
+                </twig:Sidebar:GroupContent>
+            </twig:Sidebar:Group>
+        {% endif %}
+    {% endfor %}
+</nav>

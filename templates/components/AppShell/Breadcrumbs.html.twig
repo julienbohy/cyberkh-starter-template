@@ -1,0 +1,22 @@
+{#- The trail from the dashboard to the current page: every item has a url but the last one. -#}
+{%- props
+    ## list<array{label: string, url?: string}> The items after the dashboard.
+    items = []
+-%}
+{%- set trail = [{label: 'nav.dashboard'|trans, url: path('app_home')}]|merge(items) -%}
+<twig:Breadcrumb>
+    <twig:Breadcrumb:List>
+        {% for item in trail %}
+            <twig:Breadcrumb:Item>
+                {% if loop.last %}
+                    <twig:Breadcrumb:Page>{{ item.label }}</twig:Breadcrumb:Page>
+                {% else %}
+                    <twig:Breadcrumb:Link href="{{ item.url }}">{{ item.label }}</twig:Breadcrumb:Link>
+                {% endif %}
+            </twig:Breadcrumb:Item>
+            {% if not loop.last %}
+                <twig:Breadcrumb:Separator />
+            {% endif %}
+        {% endfor %}
+    </twig:Breadcrumb:List>
+</twig:Breadcrumb>

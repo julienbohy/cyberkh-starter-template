@@ -77,7 +77,8 @@ function db_reset(string $env = 'dev'): void
     // Emptied rather than dropped: PostgreSQL refuses to drop a database that a worker is connected to.
     run([...$console, 'doctrine:schema:drop', '--full-database', '--force']);
     run([...$console, 'doctrine:migrations:migrate', '--no-interaction', '--allow-no-migration']);
-    run([...$console, 'foundry:load-fixtures', '--no-interaction']);
+    // Appended: Foundry would build the schema again from the mapping, without the migrations.
+    run([...$console, 'foundry:load-fixtures', '--append', '--no-interaction']);
 }
 
 #[AsTask(namespace: 'qa', description: 'Run all the static checks')]

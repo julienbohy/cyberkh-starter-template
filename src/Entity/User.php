@@ -3,9 +3,11 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
+use App\Security\Role;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Types\UuidType;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\EquatableInterface;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Uid\Uuid;
@@ -15,7 +17,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 #[ORM\Table(name: '`user`')]
 #[ORM\UniqueConstraint(name: 'UNIQ_IDENTIFIER_EMAIL', fields: ['email'])]
 #[UniqueEntity(fields: ['email'], message: 'email.already_used')]
-class User implements UserInterface, PasswordAuthenticatedUserInterface
+class User implements UserInterface, PasswordAuthenticatedUserInterface, EquatableInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: UuidType::NAME, unique: true)]
@@ -42,6 +44,20 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column]
     private bool $isVerified = false;
+
+    /**
+     * A disabled user cannot log in, and is logged out at their next request.
+     */
+    #[ORM\Column]
+    private bool $enabled = true;
+
+    #[ORM\Column]
+    private \DateTimeImmutable $createdAt;
+
+    public function __construct()
+    {
+        $this->createdAt = new \DateTimeImmutable();
+    }
 
     public function getId(): ?Uuid
     {
@@ -132,5 +148,62 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->isVerified = $isVerified;
 
         return $this;
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
+    }
+
+    public function setEnabled(bool $enabled): static
+    {
+        $this->enabled = $enabled;
+
+        return $this;
+    }
+
+    public function getCreatedAt(): \DateTimeImmutable
+    {
+        return $this->createdAt;
+    }
+
+    /**
+     * The roles granted by hand: ROLE_USER, which every user has, is not one of them.
+     *
+     * @return list<Role>
+     */
+    public function getGrantedRoles(): array
+    {
+        return array_values(array_filter(array_map(Role::tryFrom(...), $this->roles)));
+    }
+
+    /**
+     * @param list<Role> $roles
+     */
+    public function setGrantedRoles(array $roles): static
+    {
+        $this->roles = array_map(static fn(Role $role): string => $role->value, $roles);
+
+        return $this;
+    }
+
+    /**
+     * Whether the user of the session ($this) is still the one in the database ($user): if not, they
+     * are logged out. Compares what Symfony compares by default, and whether the user is enabled.
+     */
+    public function isEqualTo(UserInterface $user): bool
+    {
+        if (! $user instanceof self) {
+            return false;
+        }
+
+        // The password of the user of the session is CRC32C-hashed (__serialize()).
+        $samePassword = \in_array($this->password, [$user->password, hash('crc32c', $user->password)], true);
+        $ownRoles = $this->getRoles();
+        $otherRoles = $user->getRoles();
+        sort($ownRoles);
+        sort($otherRoles);
+
+        return $user->enabled && $this->email === $user->email && $samePassword && $ownRoles === $otherRoles;
     }
 }

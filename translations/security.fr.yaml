@@ -1,3 +1,4 @@
 security:
     login:
         email_not_verified: Confirmez d'abord votre adresse email, avec le lien reçu à l'inscription.
+        account_disabled: Ce compte est désactivé.

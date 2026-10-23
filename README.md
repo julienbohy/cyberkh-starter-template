@@ -13,7 +13,9 @@ or with **Use this template** on GitHub.
 - **PHP 8.5** (`.php-version`) and **Symfony 8.1**
 - **Doctrine ORM** with migrations, on **PostgreSQL 18**
 - **Messenger** (Doctrine transport), **Mailer**, **Notifier**
-- **Users**: login, registration with email verification, password reset
+- **Users**: login, registration with email verification, password reset, and their
+  management by the super admins
+- **Application shell**: collapsible sidebar menu, breadcrumbs and user menu
 - **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
 - **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
 - **PHPUnit**, **Foundry** and **DAMA Doctrine Test Bundle** for the tests
@@ -36,7 +38,8 @@ symfony open:local
 
 `castor install` installs the dependencies, starts the Docker services (PostgreSQL, Mailpit)
 and the web server, then runs the migrations. `castor db:reset` loads the development data:
-log in with `user@example.com` and the password `correct-horse-battery-staple`.
+log in with `admin@example.com` (super admin) or `user@example.com`, and the password
+`correct-horse-battery-staple`.
 
 The web server also runs two workers (`.symfony.local.yaml`): the Messenger consumer, which
 sends the emails, and the Tailwind watcher.
@@ -87,6 +90,39 @@ The mails sent in development land in Mailpit: `symfony open:local:webmail`.
 - The emails are sent from `MAILER_FROM`, through the `async` Messenger transport.
 - The pages are translated in French (the default locale) and in English (`translations/`).
 - The forms are rendered with the shadcn components (`templates/form/shadcn_layout.html.twig`).
+
+### Roles and user management
+
+`ROLE_SUPER_ADMIN` > `ROLE_ADMIN` > `ROLE_USER` (`config/packages/security.yaml`, `App\Security\Role`).
+`ROLE_ADMIN` is ready for the business administration of each project; only the super admins
+manage the users, at `/admin/users`:
+
+- search the users by email;
+- invite a user: they receive a link to choose their password, valid for 3 days;
+- change their roles, disable their account (they are logged out at their next request), mark
+  their email as verified, send them a new password link;
+- delete their account, or log in as them (`switch_user`), to see the application with their rights.
+
+A super admin cannot change their own roles, disable or delete their own account.
+
+Create the first super admin with:
+
+```shell
+symfony console app:user:create admin@your-domain.com --super-admin
+```
+
+## Application shell
+
+The signed-in pages extend `layout/app.html.twig`: the `AppShell` component puts them in a
+collapsible sidebar, with breadcrumbs and a user menu. A page sets its breadcrumbs after `extends`:
+
+```twig
+{% set breadcrumbs = [{label: 'admin.user.index.title'|trans}] %}
+```
+
+The menu is in `templates/components/AppShell/Navigation.html.twig`: a feature adds its entries
+there, in a group of its own, with the role that can see them. The pages of the visitors (login,
+registration, password reset) extend `layout/auth.html.twig`.
 
 ## Quality
 

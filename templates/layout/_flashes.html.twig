@@ -1,0 +1,8 @@
+{#- The flash messages: translation keys, or messages translated already. -#}
+{% for type, messages in app.flashes(['success', 'error']) %}
+    {% for message in messages %}
+        <twig:Alert variant="{{ type == 'error' ? 'destructive' : 'default' }}" class="{{ flash_class|default('mb-6') }}">
+            <twig:Alert:Description>{{ message|trans }}</twig:Alert:Description>
+        </twig:Alert>
+    {% endfor %}
+{% endfor %}

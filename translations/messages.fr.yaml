@@ -5,11 +5,26 @@ nav:
     login: Se connecter
     logout: Se déconnecter
     register: Créer un compte
+    main: Navigation principale
+    toggle_sidebar: Afficher ou masquer le menu
+    dashboard: Tableau de bord
+    administration: Administration
+    users: Utilisateurs
+    impersonating: 'Vous êtes connecté en tant que %email%.'
+    exit_impersonation: Revenir à mon compte
 
-home:
-    title: Bienvenue
+dashboard:
+    title: Tableau de bord
+    welcome: Bienvenue
     logged_in_as: 'Vous êtes connecté avec %email%.'
-    anonymous: Connectez-vous pour accéder à votre compte.
+
+role:
+    SuperAdmin: Super administrateur
+    Admin: Administrateur
+
+pagination:
+    previous: Précédent
+    next: Suivant
 
 email:
     link_expires: 'Ce lien expire dans %delay%.'
@@ -72,3 +87,60 @@ reset_password:
         ignore: Si vous n'êtes pas à l'origine de cette demande, ignorez cet email.
     flash:
         password_changed: Votre mot de passe a été changé, vous pouvez vous connecter.
+
+admin:
+    user:
+        index:
+            title: Utilisateurs
+            invite: Inviter un utilisateur
+            search: Rechercher par email
+            search_submit: Rechercher
+            empty: Aucun utilisateur.
+        column:
+            email: Email
+            roles: Rôles
+            status: Statut
+            created_at: Créé le
+        status:
+            active: Actif
+            unverified: Email non vérifié
+            invited: Invitation en attente
+            disabled: Désactivé
+        form:
+            email: Email
+            roles: Rôles
+            roles_help: Tout utilisateur peut se connecter ; les rôles donnent des droits en plus.
+            enabled: Compte actif
+            enabled_help: Un compte désactivé ne peut plus se connecter, et sa session en cours est fermée.
+            verified: Email vérifié
+        new:
+            title: Inviter un utilisateur
+            description: L'utilisateur reçoit un email avec un lien pour choisir son mot de passe.
+            submit: Envoyer l'invitation
+        edit:
+            account: Compte
+            own_account: C'est votre compte, vous ne pouvez pas changer vos rôles ni le désactiver.
+            created_at: 'Créé le %date%'
+            submit: Enregistrer
+            actions: Actions
+            password_link: Envoyer un lien de mot de passe
+            password_link_help: Un email avec un lien pour choisir un nouveau mot de passe, valable 3 jours. Il renvoie aussi une invitation.
+            impersonate: Se connecter en tant que cet utilisateur
+            impersonate_help: Pour voir l'application avec ses droits. Revenez à votre compte depuis le bandeau ou le menu.
+            delete: Supprimer le compte
+            delete_help: Définitif.
+        delete:
+            title: Supprimer ce compte ?
+            description: 'Le compte %email% sera supprimé définitivement.'
+            cancel: Annuler
+            confirm: Supprimer définitivement
+        flash:
+            invited: L'invitation a été envoyée.
+            saved: Le compte a été enregistré.
+            password_link_sent: Le lien de mot de passe a été envoyé.
+            deleted: Le compte a été supprimé.
+        invitation_email:
+            subject: Votre invitation
+            heading: 'Bienvenue sur %app%'
+            intro: Un compte vient d'être créé pour vous. Choisissez votre mot de passe pour l'activer.
+            link: Choisir mon mot de passe

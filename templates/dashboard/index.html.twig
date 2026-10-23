@@ -1,0 +1,17 @@
+{% extends 'layout/app.html.twig' %}
+
+{% set breadcrumbs = [] %}
+
+{% block title %}{{ 'nav.dashboard'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        <h1 class="text-2xl font-semibold">{{ 'dashboard.title'|trans }}</h1>
+        <twig:Card>
+            <twig:Card:Header>
+                <twig:Card:Title>{{ 'dashboard.welcome'|trans }}</twig:Card:Title>
+                <twig:Card:Description>{{ 'dashboard.logged_in_as'|trans({'%email%': app.user.userIdentifier}) }}</twig:Card:Description>
+            </twig:Card:Header>
+        </twig:Card>
+    </div>
+{% endblock %}

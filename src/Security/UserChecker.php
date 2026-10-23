@@ -11,7 +11,7 @@ use Symfony\Component\Security\Core\User\UserCheckerInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 /**
- * Refuses the login of a user until they have verified their email address.
+ * Refuses the login of a disabled user, and of a user who has not verified their email address yet.
  */
 final class UserChecker implements UserCheckerInterface
 {
@@ -22,8 +22,16 @@ final class UserChecker implements UserCheckerInterface
      */
     public function checkPostAuth(UserInterface $user, ?TokenInterface $token = null): void
     {
-        if ($user instanceof User && ! $user->isVerified()) {
-            // Translated in the "security" domain, as the other authentication errors.
+        if (! $user instanceof User) {
+            return;
+        }
+
+        // Translated in the "security" domain, as the other authentication errors.
+        if (! $user->isEnabled()) {
+            throw new CustomUserMessageAccountStatusException('security.login.account_disabled');
+        }
+
+        if (! $user->isVerified()) {
             throw new CustomUserMessageAccountStatusException('security.login.email_not_verified');
         }
     }

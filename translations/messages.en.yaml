@@ -5,11 +5,26 @@ nav:
     login: Log in
     logout: Log out
     register: Sign up
+    main: Main navigation
+    toggle_sidebar: Toggle the menu
+    dashboard: Dashboard
+    administration: Administration
+    users: Users
+    impersonating: 'You are logged in as %email%.'
+    exit_impersonation: Back to my account
 
-home:
-    title: Welcome
+dashboard:
+    title: Dashboard
+    welcome: Welcome
     logged_in_as: 'You are logged in as %email%.'
-    anonymous: Log in to access your account.
+
+role:
+    SuperAdmin: Super admin
+    Admin: Admin
+
+pagination:
+    previous: Previous
+    next: Next
 
 email:
     link_expires: 'This link expires in %delay%.'
@@ -72,3 +87,60 @@ reset_password:
         ignore: If you did not ask for it, ignore this email.
     flash:
         password_changed: Your password was changed, you can log in.
+
+admin:
+    user:
+        index:
+            title: Users
+            invite: Invite a user
+            search: Search by email
+            search_submit: Search
+            empty: No user.
+        column:
+            email: Email
+            roles: Roles
+            status: Status
+            created_at: Created on
+        status:
+            active: Active
+            unverified: Email not verified
+            invited: Invitation pending
+            disabled: Disabled
+        form:
+            email: Email
+            roles: Roles
+            roles_help: Every user can log in; the roles grant more rights.
+            enabled: Account enabled
+            enabled_help: A disabled account cannot log in any more, and its current session is closed.
+            verified: Email verified
+        new:
+            title: Invite a user
+            description: The user receives an email with a link to choose their password.
+            submit: Send the invitation
+        edit:
+            account: Account
+            own_account: This is your account, you cannot change your roles nor disable it.
+            created_at: 'Created on %date%'
+            submit: Save
+            actions: Actions
+            password_link: Send a password link
+            password_link_help: An email with a link to choose a new password, valid for 3 days. It sends an invitation again, too.
+            impersonate: Log in as this user
+            impersonate_help: To see the application with their rights. Come back to your account from the banner or the menu.
+            delete: Delete the account
+            delete_help: Permanent.
+        delete:
+            title: Delete this account?
+            description: 'The account %email% will be deleted permanently.'
+            cancel: Cancel
+            confirm: Delete permanently
+        flash:
+            invited: The invitation was sent.
+            saved: The account was saved.
+            password_link_sent: The password link was sent.
+            deleted: The account was deleted.
+        invitation_email:
+            subject: Your invitation
+            heading: 'Welcome to %app%'
+            intro: An account was just created for you. Choose your password to activate it.
+            link: Choose my password

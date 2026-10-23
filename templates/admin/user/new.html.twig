@@ -1,0 +1,26 @@
+{% extends 'layout/app.html.twig' %}
+
+{% set breadcrumbs = [
+    {label: 'admin.user.index.title'|trans, url: path('admin_user_index')},
+    {label: 'admin.user.new.title'|trans},
+] %}
+
+{% block title %}{{ 'admin.user.new.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <twig:Card class="max-w-lg">
+        <twig:Card:Header>
+            <twig:Card:Title><h1>{{ 'admin.user.new.title'|trans }}</h1></twig:Card:Title>
+            <twig:Card:Description>{{ 'admin.user.new.description'|trans }}</twig:Card:Description>
+        </twig:Card:Header>
+        <twig:Card:Content>
+            {{ form_start(form, {attr: {class: 'space-y-6'}}) }}
+                {{ form_errors(form) }}
+                {{ form_row(form.email) }}
+                {{ form_row(form.grantedRoles) }}
+
+                <twig:Button type="submit">{{ 'admin.user.new.submit'|trans }}</twig:Button>
+            {{ form_end(form) }}
+        </twig:Card:Content>
+    </twig:Card>
+{% endblock %}

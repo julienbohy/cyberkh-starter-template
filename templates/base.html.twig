@@ -20,33 +20,7 @@
         {% endif %}
     </head>
     <body class="min-h-screen antialiased">
-        <header class="border-b">
-            <nav class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
-                <a href="{{ path('app_home') }}" class="font-semibold">{{ 'app.name'|trans }}</a>
-                <div class="flex items-center gap-2">
-                    {% if app.user %}
-                        <span class="text-sm text-muted-foreground">{{ app.user.userIdentifier }}</span>
-                        <twig:Button as="a" href="{{ logout_path() }}" variant="outline" size="sm">{{ 'nav.logout'|trans }}</twig:Button>
-                    {% else %}
-                        <twig:Button as="a" href="{{ path('app_login') }}" variant="ghost" size="sm">{{ 'nav.login'|trans }}</twig:Button>
-                        {% if registration_enabled %}
-                            <twig:Button as="a" href="{{ path('app_register') }}" size="sm">{{ 'nav.register'|trans }}</twig:Button>
-                        {% endif %}
-                    {% endif %}
-                </div>
-            </nav>
-        </header>
-
-        <main class="mx-auto max-w-5xl px-4 py-10">
-            {% for type, messages in app.flashes(['success', 'error']) %}
-                {% for message in messages %}
-                    <twig:Alert variant="{{ type == 'error' ? 'destructive' : 'default' }}" class="mx-auto mb-6 max-w-sm">
-                        <twig:Alert:Description>{{ message|trans }}</twig:Alert:Description>
-                    </twig:Alert>
-                {% endfor %}
-            {% endfor %}
-
-            {% block body %}{% endblock %}
-        </main>
+        {#- The pages extend a layout: layout/app.html.twig (signed in) or layout/auth.html.twig. -#}
+        {% block layout %}{% endblock %}
     </body>
 </html>

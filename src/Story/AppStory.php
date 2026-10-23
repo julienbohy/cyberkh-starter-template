@@ -16,9 +16,14 @@ final class AppStory extends Story
 {
     public function build(): void
     {
-        // Log in with this email and UserFactory::DEFAULT_PASSWORD.
+        // Log in with these emails and UserFactory::DEFAULT_PASSWORD.
+        UserFactory::new()->superAdmin()->create([
+            'email' => 'admin@example.com',
+        ]);
         UserFactory::createOne([
             'email' => 'user@example.com',
         ]);
+        UserFactory::new()->unverified()->many(3)->create();
+        UserFactory::new()->disabled()->create();
     }
 }

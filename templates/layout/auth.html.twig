@@ -1,0 +1,22 @@
+{#- The pages of the visitors: login, registration, password reset. -#}
+{% extends 'base.html.twig' %}
+
+{% block layout %}
+    <header class="border-b">
+        <nav class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
+            <a href="{{ path('app_login') }}" class="font-semibold">{{ 'app.name'|trans }}</a>
+            <div class="flex items-center gap-2">
+                <twig:Button as="a" href="{{ path('app_login') }}" variant="ghost" size="sm">{{ 'nav.login'|trans }}</twig:Button>
+                {% if registration_enabled %}
+                    <twig:Button as="a" href="{{ path('app_register') }}" size="sm">{{ 'nav.register'|trans }}</twig:Button>
+                {% endif %}
+            </div>
+        </nav>
+    </header>
+
+    <main class="mx-auto max-w-5xl px-4 py-10">
+        {{ include('layout/_flashes.html.twig', {flash_class: 'mx-auto mb-6 max-w-sm'}) }}
+
+        {% block body %}{% endblock %}
+    </main>
+{% endblock %}

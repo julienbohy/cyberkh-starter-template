@@ -1,0 +1,7 @@
+<h1>{{ 'admin.user.invitation_email.heading'|trans({'%app%': 'app.name'|trans}) }}</h1>
+
+<p>{{ 'admin.user.invitation_email.intro'|trans }}</p>
+
+<p><a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ 'admin.user.invitation_email.link'|trans }}</a></p>
+
+<p>{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>

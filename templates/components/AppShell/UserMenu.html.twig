@@ -1,0 +1,24 @@
+{#- The signed-in user and the logout link: logout_path() carries the CSRF token of the logout. -#}
+<twig:DropdownMenu id="user-menu" align="end">
+    <twig:DropdownMenu:Trigger>
+        <twig:Button variant="ghost" size="sm" {{ ...dropdown_menu_trigger_attrs }}>
+            <twig:ux:icon name="lucide:user-round" aria-hidden="true" />
+            <span class="max-w-48 truncate max-sm:sr-only">{{ app.user.userIdentifier }}</span>
+            <twig:ux:icon name="lucide:chevron-down" aria-hidden="true" />
+        </twig:Button>
+    </twig:DropdownMenu:Trigger>
+    <twig:DropdownMenu:Content class="w-64">
+        <twig:DropdownMenu:Label class="truncate">{{ app.user.userIdentifier }}</twig:DropdownMenu:Label>
+        <twig:DropdownMenu:Separator />
+        {% if is_granted('IS_IMPERSONATOR') %}
+            <twig:DropdownMenu:Item as="a" href="{{ impersonation_exit_path(path('admin_user_index')) }}">
+                <twig:ux:icon name="lucide:undo-2" aria-hidden="true" />
+                {{ 'nav.exit_impersonation'|trans }}
+            </twig:DropdownMenu:Item>
+        {% endif %}
+        <twig:DropdownMenu:Item as="a" href="{{ logout_path() }}">
+            <twig:ux:icon name="lucide:log-out" aria-hidden="true" />
+            {{ 'nav.logout'|trans }}
+        </twig:DropdownMenu:Item>
+    </twig:DropdownMenu:Content>
+</twig:DropdownMenu>

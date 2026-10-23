@@ -1,0 +1,10 @@
+{#- The status of `user`: disabled, invitation pending (no password yet), unverified, or active. -#}
+{% if not user.enabled %}
+    <twig:Badge variant="destructive">{{ 'admin.user.status.disabled'|trans }}</twig:Badge>
+{% elseif user.password is empty %}
+    <twig:Badge variant="outline">{{ 'admin.user.status.invited'|trans }}</twig:Badge>
+{% elseif not user.verified %}
+    <twig:Badge variant="outline">{{ 'admin.user.status.unverified'|trans }}</twig:Badge>
+{% else %}
+    <twig:Badge variant="secondary">{{ 'admin.user.status.active'|trans }}</twig:Badge>
+{% endif %}

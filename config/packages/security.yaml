@@ -11,6 +11,10 @@ security:
                 class: App\Entity\User
                 property: email
 
+    role_hierarchy:
+        ROLE_ADMIN: ROLE_USER
+        ROLE_SUPER_ADMIN: [ROLE_ADMIN, ROLE_ALLOWED_TO_SWITCH]
+
     firewalls:
         dev:
             # Ensure dev tools and static assets are always allowed
@@ -31,18 +35,15 @@ security:
                 lifetime: 2592000 # 30 days
             logout:
                 path: app_logout
-                target: app_home
-
-            # Activate different ways to authenticate:
-            # https://symfony.com/doc/current/security.html#the-firewall
-
-            # https://symfony.com/doc/current/security/impersonating_user.html
-            # switch_user: true
+                target: app_login
+                # With a CSRF token, which logout_path() adds: no link from elsewhere can log a user out.
+                enable_csrf: true
+            # "Log in as" a user, for the super admins: /?_switch_user=email, /?_switch_user=_exit.
+            switch_user: true
 
     # Note: Only the *first* matching rule is applied
     access_control:
-        # - { path: ^/admin, roles: ROLE_ADMIN }
-        # - { path: ^/profile, roles: ROLE_USER }
+        - { path: ^/admin, roles: ROLE_SUPER_ADMIN }
 
 when@test:
     security:

@@ -1,0 +1,79 @@
+{% extends 'layout/app.html.twig' %}
+
+{% set breadcrumbs = [{label: 'admin.user.index.title'|trans}] %}
+
+{% block title %}{{ 'admin.user.index.title'|trans }} · {{ parent() }}{% endblock %}
+
+{% block body %}
+    <div class="space-y-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <h1 class="text-2xl font-semibold">{{ 'admin.user.index.title'|trans }}</h1>
+            <twig:Button as="a" href="{{ path('admin_user_new') }}">
+                <twig:ux:icon name="lucide:user-plus" aria-hidden="true" />
+                {{ 'admin.user.index.invite'|trans }}
+            </twig:Button>
+        </div>
+
+        <form method="get" role="search" class="flex max-w-md gap-2">
+            <twig:Input type="search" name="q" value="{{ search }}" :aria-label="'admin.user.index.search'|trans" :placeholder="'admin.user.index.search'|trans" />
+            <twig:Button type="submit" variant="outline">{{ 'admin.user.index.search_submit'|trans }}</twig:Button>
+        </form>
+
+        <twig:Table>
+            <twig:Table:Header>
+                <twig:Table:Row>
+                    <twig:Table:Head>{{ 'admin.user.column.email'|trans }}</twig:Table:Head>
+                    <twig:Table:Head>{{ 'admin.user.column.roles'|trans }}</twig:Table:Head>
+                    <twig:Table:Head>{{ 'admin.user.column.status'|trans }}</twig:Table:Head>
+                    <twig:Table:Head>{{ 'admin.user.column.created_at'|trans }}</twig:Table:Head>
+                </twig:Table:Row>
+            </twig:Table:Header>
+            <twig:Table:Body>
+                {% for user in users.items %}
+                    <twig:Table:Row>
+                        <twig:Table:Cell class="font-medium">
+                            <a href="{{ path('admin_user_edit', {id: user.id}) }}" class="underline-offset-4 hover:underline">{{ user.email }}</a>
+                        </twig:Table:Cell>
+                        <twig:Table:Cell>
+                            <div class="flex flex-wrap gap-1">
+                                {% for role in user.grantedRoles %}
+                                    <twig:Badge variant="secondary">{{ role.label|trans }}</twig:Badge>
+                                {% endfor %}
+                            </div>
+                        </twig:Table:Cell>
+                        <twig:Table:Cell>
+                            {{ include('admin/user/_status.html.twig') }}
+                        </twig:Table:Cell>
+                        <twig:Table:Cell class="text-muted-foreground">{{ user.createdAt|format_date('medium') }}</twig:Table:Cell>
+                    </twig:Table:Row>
+                {% else %}
+                    <twig:Table:Row>
+                        <twig:Table:Cell colspan="4" class="py-8 text-center text-muted-foreground">{{ 'admin.user.index.empty'|trans }}</twig:Table:Cell>
+                    </twig:Table:Row>
+                {% endfor %}
+            </twig:Table:Body>
+        </twig:Table>
+
+        {% if users.pageCount > 1 %}
+            <twig:Pagination>
+                <twig:Pagination:Content>
+                    {% if users.number > 1 %}
+                        <twig:Pagination:Item>
+                            <twig:Pagination:Previous href="{{ path('admin_user_index', {q: search, page: users.number - 1}) }}" :text="'pagination.previous'|trans" />
+                        </twig:Pagination:Item>
+                    {% endif %}
+                    {% for number in 1..users.pageCount %}
+                        <twig:Pagination:Item>
+                            <twig:Pagination:Link href="{{ path('admin_user_index', {q: search, page: number}) }}" :active="number == users.number">{{ number }}</twig:Pagination:Link>
+                        </twig:Pagination:Item>
+                    {% endfor %}
+                    {% if users.number < users.pageCount %}
+                        <twig:Pagination:Item>
+                            <twig:Pagination:Next href="{{ path('admin_user_index', {q: search, page: users.number + 1}) }}" :text="'pagination.next'|trans" />
+                        </twig:Pagination:Item>
+                    {% endif %}
+                </twig:Pagination:Content>
+            </twig:Pagination>
+        {% endif %}
+    </div>
+{% endblock %}

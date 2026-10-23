@@ -7,12 +7,15 @@ namespace App\Controller;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
-final class HomeController extends AbstractController
+final class DashboardController extends AbstractController
 {
     #[Route(path: '/', name: 'app_home')]
+    #[IsGranted(attribute: AuthenticatedVoter::IS_AUTHENTICATED)]
     public function index(): Response
     {
-        return $this->render('home/index.html.twig');
+        return $this->render('dashboard/index.html.twig');
     }
 }
