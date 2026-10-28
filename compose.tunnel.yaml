@@ -1,0 +1,27 @@
+# The production behind a Cloudflare Tunnel, over compose.prod.yaml: cloudflared connects out to
+# Cloudflare, which serves HTTPS, and no port of the server is open (castor prod:start):
+#   docker compose -f compose.yaml -f compose.prod.yaml -f compose.tunnel.yaml up --detach --wait --build
+# CLOUDFLARE_TUNNEL_TOKEN comes from the environment of the host: the token of a tunnel made in the
+# Zero Trust dashboard, whose public hostname (SERVER_NAME) goes to http://php:80.
+
+services:
+  php:
+    environment:
+      # Caddy serves HTTP, inside the Docker network only: the certificate is the one of Cloudflare.
+      # DEFAULT_URI keeps the domain, the SERVER_NAME of the host.
+      SERVER_NAME: ":80"
+      # cloudflared, from the Docker network, tells the client and the HTTPS of the request.
+      SYMFONY_TRUSTED_PROXIES: PRIVATE_SUBNETS
+      SYMFONY_TRUSTED_HEADERS: x-forwarded-for,x-forwarded-proto
+    ports: !reset []
+
+  cloudflared:
+    image: cloudflare/cloudflared:2026.10.0
+    restart: unless-stopped
+    command: ["tunnel", "--no-autoupdate", "run"]
+    environment:
+      TUNNEL_TOKEN: ${CLOUDFLARE_TUNNEL_TOKEN:?CLOUDFLARE_TUNNEL_TOKEN is required}
+    # No healthcheck: the image has neither a shell nor curl.
+    depends_on:
+      php:
+        condition: service_healthy

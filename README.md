@@ -198,6 +198,33 @@ docker compose -f compose.yaml -f compose.prod.yaml exec php bin/console doctrin
 
 Caddy gets the HTTPS certificate of `SERVER_NAME` on its own.
 
+### With Castor and a Cloudflare Tunnel
+
+On the server, Castor keeps the configuration in `.env.prod.local` (git-ignored, out of the image),
+and the variables exported on the host win over it:
+
+| Task                   | What it does                                                         |
+|------------------------|----------------------------------------------------------------------|
+| `castor prod:init`     | Ask the domain, the mailer and the tunnel token, generate the secrets |
+| `castor prod:start`    | Build the prod image, start the services, then run the migrations    |
+| `castor prod:stop`     | Stop the services                                                    |
+| `castor prod:console …`| Run a command of the Symfony console, in production                  |
+
+With `.env.prod.local`, Docker Compose reads it instead of `.env`, whose values are the
+development defaults.
+
+When `CLOUDFLARE_TUNNEL_TOKEN` is set, the services of `compose.tunnel.yaml` are added: the
+`cloudflared` container connects out to Cloudflare, which serves HTTPS, and no port of the
+server is open (Caddy serves HTTP inside the Docker network, and Symfony trusts the
+`X-Forwarded-*` headers of the tunnel). To set it up:
+
+1. In the Zero Trust dashboard (Networks > Tunnels), create a tunnel with the `cloudflared`
+   connector, and copy its token.
+2. Give the tunnel a public hostname, `SERVER_NAME`, whose service is `http://php:80`.
+3. Run `castor prod:init` and answer yes to the tunnel, then `castor prod:start`.
+
+The token gives access to the tunnel: never commit it.
+
 ## After creating a project from the template
 
 - Rename the project in this README (and in `composer.json` with **Use this template**: Flex removes the name)
