@@ -1,0 +1,11 @@
+# The code runs in Linux containers: keep LF endings even on a Windows checkout
+* text=auto eol=lf
+
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.webp binary
+*.woff binary
+*.woff2 binary
