@@ -100,7 +100,7 @@ Castor, or pass these files yourself with `--env-file`.
 | `castor qa:fix`        | Apply the coding standard fixes (`composer fix`)                |
 | `castor qa:test`       | Run the test suite                                              |
 
-The tasks are in `.castor/`, one file per prefix; `castor.php` imports them. The mails sent in
+The production has its own tasks, `castor prod:*` (see [Production](#production)). The tasks are in `.castor/`, one file per prefix; `castor.php` imports them. The mails sent in
 development land in Mailpit, at http://localhost:8025.
 
 ## Users
@@ -186,44 +186,125 @@ the fixes of ECS and Twig-CS-Fixer.
 ## Production
 
 The `frankenphp_prod` image holds the code, the dependencies and the compiled assets, and serves
-every request through the long-running kernel of FrankenPHP (worker mode). On the server:
+every request through the long-running kernel of FrankenPHP (worker mode). The `castor prod:*`
+tasks run it on the server, in two modes:
 
-```shell
-export SERVER_NAME=your-domain.com APP_SECRET=… POSTGRES_PASSWORD=… MAILER_DSN=… MAILER_FROM=…
-# The uploaded files: in the app_storage volume by default, or on S3
-export STORAGE_ADAPTER=s3 S3_BUCKET=… S3_REGION=… S3_ACCESS_KEY=… S3_SECRET_KEY=…
-docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
-docker compose -f compose.yaml -f compose.prod.yaml exec php bin/console doctrine:migrations:migrate --no-interaction
+- **Cloudflare Tunnel** (`compose.tunnel.yaml`): the `cloudflared` container connects out to
+  Cloudflare, which serves HTTPS. No port of the server is open: a server at home or behind a
+  NAT will do.
+- **Direct HTTPS**: Caddy gets the certificate of the domain on its own (Let's Encrypt). The
+  ports 80 and 443 of the server must be open, and the DNS of the domain must point to it.
+
+The production is its own Docker Compose project, `<directory>-prod`, with its own containers and
+volumes: it can run on a checkout that runs the development too, without touching it.
+
+### The tasks
+
+| Task                    | What it does                                                          |
+|-------------------------|-----------------------------------------------------------------------|
+| `castor prod:init`      | Ask the domain, the mailer and the tunnel token, generate the secrets |
+| `castor prod:start`     | Build the prod image, start the services, then run the migrations     |
+| `castor prod:stop`      | Stop the services (the data stays in the volumes)                     |
+| `castor prod:console …` | Run a command of the Symfony console, in production                   |
+
+### The configuration
+
+`castor prod:init` writes it in `.env.prod.local`, at the root of the checkout: git-ignored, left
+out of the image, and readable by its owner only. Run it again to change a value: it proposes the
+current ones, and keeps the other lines of the file.
+
+| Variable                  | Value                                                              |
+|---------------------------|--------------------------------------------------------------------|
+| `SERVER_NAME`             | The domain, e.g. `app.example.com`                                 |
+| `APP_SECRET`              | Generated once: a new one would log out the users                  |
+| `POSTGRES_PASSWORD`       | Generated once: PostgreSQL keeps the password of its first start   |
+| `MAILER_DSN`              | The mailer, e.g. `smtp://user:password@smtp.example.com:587`       |
+| `MAILER_FROM`             | The sender of the emails, e.g. `App <noreply@example.com>`         |
+| `CLOUDFLARE_TUNNEL_TOKEN` | The token of the tunnel; empty for the direct HTTPS                |
+
+The uploaded files are in the `app_storage` volume. To keep them on S3 instead, add these lines to
+`.env.prod.local`:
+
+```dotenv
+STORAGE_ADAPTER=s3
+S3_BUCKET=…
+S3_REGION=…
+S3_ACCESS_KEY=…
+S3_SECRET_KEY=…
+# For an S3-compatible server, not AWS:
+S3_ENDPOINT=https://…
+S3_PATH_STYLE=1
 ```
 
-Caddy gets the HTTPS certificate of `SERVER_NAME` on its own.
+Docker Compose reads `.env.prod.local` instead of `.env`, whose values are the development
+defaults. A variable exported on the host wins over the file.
 
-### With Castor and a Cloudflare Tunnel
+### First deployment
 
-On the server, Castor keeps the configuration in `.env.prod.local` (git-ignored, out of the image),
-and the variables exported on the host win over it:
+On the server, with Docker and [Castor](https://castor.jolicode.com):
 
-| Task                   | What it does                                                         |
-|------------------------|----------------------------------------------------------------------|
-| `castor prod:init`     | Ask the domain, the mailer and the tunnel token, generate the secrets |
-| `castor prod:start`    | Build the prod image, start the services, then run the migrations    |
-| `castor prod:stop`     | Stop the services                                                    |
-| `castor prod:console …`| Run a command of the Symfony console, in production                  |
+1. Clone the repository, and go into it.
+2. **With a Cloudflare Tunnel**, in the Zero Trust dashboard:
+   1. Networking > Tunnels > **Create a tunnel**, with the **Cloudflared** connector. Copy the
+      token of the install command (the long string after `--token`): the container of the
+      project is the connector, do not install another one.
+   2. In the tunnel, tab **Routes** > **Add route** > **Published application**: the subdomain
+      and the domain of the application, and the service URL `http://php:80` (`php` is the
+      container, in the Docker network). Cloudflare creates the DNS record. Do not confuse it
+      with the Networking > Routes page, which is for private networks.
 
-With `.env.prod.local`, Docker Compose reads it instead of `.env`, whose values are the
-development defaults.
+   **With the direct HTTPS**, point the DNS of the domain to the server (A and AAAA records),
+   and open the ports 80 and 443.
+3. `castor prod:init`: answer yes to the tunnel and paste its token, or no for the direct HTTPS.
+4. `castor prod:start`. The first build takes a few minutes.
+5. Create the first user, a super admin (the command asks for the password):
 
-When `CLOUDFLARE_TUNNEL_TOKEN` is set, the services of `compose.tunnel.yaml` are added: the
-`cloudflared` container connects out to Cloudflare, which serves HTTPS, and no port of the
-server is open (Caddy serves HTTP inside the Docker network, and Symfony trusts the
-`X-Forwarded-*` headers of the tunnel). To set it up:
+   ```shell
+   castor prod:console app:user:create admin@example.com --super-admin
+   ```
 
-1. In the Zero Trust dashboard (Networks > Tunnels), create a tunnel with the `cloudflared`
-   connector, and copy its token.
-2. Give the tunnel a public hostname, `SERVER_NAME`, whose service is `http://php:80`.
-3. Run `castor prod:init` and answer yes to the tunnel, then `castor prod:start`.
+Then open `https://<SERVER_NAME>` and log in.
 
-The token gives access to the tunnel: never commit it.
+### Updates
+
+```shell
+git pull
+castor prod:start
+```
+
+`prod:start` builds the image again, recreates the containers whose image or configuration
+changed, and runs the new migrations.
+
+### Operations
+
+The commands of Docker Compose take the files and the project of the production. For example:
+
+```shell
+# Tunnel mode; drop -f compose.tunnel.yaml for the direct HTTPS
+alias prod-compose='docker compose --project-name <directory>-prod -f compose.yaml -f compose.prod.yaml -f compose.tunnel.yaml --env-file .env.prod.local'
+
+prod-compose ps                      # the state of the services
+prod-compose logs -f php cloudflared # their logs
+prod-compose exec database pg_dump -U app app > backup.sql   # a backup of the database
+```
+
+`<directory>` is the name of the checkout, in lower case (e.g. `cyberkh-starter-template-prod`).
+
+### Troubleshooting
+
+- **The domain does not resolve** (`NXDOMAIN`): the tunnel has no published application route
+  yet (step 2.2 above). The logs of `cloudflared` show `Registered tunnel connection` when the
+  tunnel itself is up.
+- **`password authentication failed for user "app"`**: the database volume was created with
+  another password, which PostgreSQL keeps. Put the first one back in `POSTGRES_PASSWORD`, or,
+  on a database without data only, remove the volume: `prod-compose down --volumes`.
+- **`messenger` restarts a few times on the first start**: it starts before the migrations create
+  its table, then runs once `prod:start` has run them.
+- **Redirections to `http://`, or forms refused**: the request does not go through the tunnel.
+  In tunnel mode, Symfony trusts the `X-Forwarded-*` headers from the Docker network only.
+
+The token of the tunnel gives access to it: never commit it. If it leaks, rotate it in the
+dashboard, then run `castor prod:init` and `castor prod:start` again.
 
 ## After creating a project from the template
 
