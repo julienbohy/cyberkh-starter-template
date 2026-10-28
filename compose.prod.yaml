@@ -1,5 +1,6 @@
 # The production: the prod image, which holds the code, the dependencies and the assets.
 #   docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
+# The migrations run on their own, before the application and the worker start.
 # APP_SECRET, POSTGRES_PASSWORD, SERVER_NAME (your domain), MAILER_DSN and MAILER_FROM come from
 # the environment of the host: Caddy gets the HTTPS certificate of SERVER_NAME on its own.
 
@@ -32,6 +33,9 @@ services:
       - "443:443"
       # HTTP/3
       - "443:443/udp"
+    depends_on:
+      migrations:
+        condition: service_completed_successfully
 
   messenger:
     build:
@@ -44,6 +48,24 @@ services:
       <<: *app-prod-environment
     volumes:
       - app_storage:/app/var/storage
+    healthcheck:
+      disable: true
+    depends_on:
+      # Its table, messenger_messages, comes from a migration.
+      migrations:
+        condition: service_completed_successfully
+
+  # Runs the migrations, once the database is up, then exits: before the application and the
+  # worker start, on each deployment.
+  migrations:
+    build:
+      context: .
+      target: frankenphp_prod
+    restart: "no"
+    entrypoint: ["docker-php-entrypoint"]
+    command: ["php", "bin/console", "doctrine:migrations:migrate", "--no-interaction", "--allow-no-migration"]
+    environment:
+      <<: *app-prod-environment
     healthcheck:
       disable: true
     depends_on:

@@ -58,11 +58,11 @@ function init(): void
     }
 }
 
-#[AsTask(description: 'Build the prod image, start the services (behind the Cloudflare Tunnel when it has a token), then run the migrations')]
+#[AsTask(description: 'Build the prod image, run the migrations, then start the services (behind the Cloudflare Tunnel when it has a token)')]
 function start(): void
 {
+    // The migrations service runs them, before the application and the worker start.
     run(docker_compose('up', '--detach', '--wait', '--build'));
-    run(docker_compose('exec', '-T', 'php', 'bin/console', 'doctrine:migrations:migrate', '--no-interaction', '--allow-no-migration'));
 
     $domain = env_values()['SERVER_NAME'] ?? 'localhost';
     io()->success(\sprintf('The application is running at https://%s%s.', $domain, is_tunnel() ? ', through the Cloudflare Tunnel' : ''));

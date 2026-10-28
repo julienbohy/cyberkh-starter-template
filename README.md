@@ -203,7 +203,7 @@ volumes: it can run on a checkout that runs the development too, without touchin
 | Task                    | What it does                                                          |
 |-------------------------|-----------------------------------------------------------------------|
 | `castor prod:init`      | Ask the domain, the mailer and the tunnel token, generate the secrets |
-| `castor prod:start`     | Build the prod image, start the services, then run the migrations     |
+| `castor prod:start`     | Build the prod image, run the migrations, then start the services     |
 | `castor prod:stop`      | Stop the services (the data stays in the volumes)                     |
 | `castor prod:console …` | Run a command of the Symfony console, in production                   |
 
@@ -272,8 +272,8 @@ git pull
 castor prod:start
 ```
 
-`prod:start` builds the image again, recreates the containers whose image or configuration
-changed, and runs the new migrations.
+`prod:start` builds the image again, runs the new migrations (the `migrations` service, which
+exits once done), then recreates the containers whose image or configuration changed.
 
 ### Operations
 
@@ -298,8 +298,8 @@ prod-compose exec database pg_dump -U app app > backup.sql   # a backup of the d
 - **`password authentication failed for user "app"`**: the database volume was created with
   another password, which PostgreSQL keeps. Put the first one back in `POSTGRES_PASSWORD`, or,
   on a database without data only, remove the volume: `prod-compose down --volumes`.
-- **`messenger` restarts a few times on the first start**: it starts before the migrations create
-  its table, then runs once `prod:start` has run them.
+- **`php` and `messenger` do not start**: they wait for the migrations, which failed. Their
+  error is in `prod-compose logs migrations`.
 - **Redirections to `http://`, or forms refused**: the request does not go through the tunnel.
   In tunnel mode, Symfony trusts the `X-Forwarded-*` headers from the Docker network only.
 
