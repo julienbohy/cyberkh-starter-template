@@ -129,3 +129,69 @@
         @apply bg-background text-foreground;
     }
 }
+
+/*
+ * Tom Select, the autocomplete fields: drawn with the colors of the theme, light or dark, inside the
+ * border the field already has (it keeps the classes of the input). Unlayered and prefixed with
+ * :root, to win over tom-select.default.css whatever the order the two files load in.
+ */
+:root .ts-wrapper .ts-control,
+:root .ts-wrapper.single .ts-control,
+:root .ts-wrapper.single.input-active .ts-control,
+:root .ts-wrapper.full .ts-control {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    box-shadow: none;
+    padding: 0;
+}
+
+:root .ts-control,
+:root .ts-control input,
+:root .ts-dropdown {
+    color: var(--foreground);
+    font-size: inherit;
+    line-height: inherit;
+}
+
+:root .ts-control input::placeholder {
+    color: var(--muted-foreground);
+}
+
+:root .ts-wrapper.single .ts-control::after {
+    border-color: var(--muted-foreground) transparent transparent;
+}
+
+:root .ts-wrapper.single.dropdown-active .ts-control::after {
+    border-color: transparent transparent var(--muted-foreground);
+}
+
+:root .ts-dropdown,
+:root .ts-dropdown.single {
+    background: var(--popover);
+    color: var(--popover-foreground);
+    border: 1px solid var(--border);
+    border-radius: calc(var(--radius) - 2px);
+    box-shadow: 0 4px 12px oklch(0 0 0 / 15%);
+    overflow: hidden;
+    z-index: 50;
+}
+
+:root .ts-dropdown .active,
+:root .ts-dropdown .active.create {
+    background: var(--accent);
+    color: var(--accent-foreground);
+}
+
+:root .ts-dropdown .no-results,
+:root .ts-dropdown .create {
+    color: var(--muted-foreground);
+}
+
+:root .ts-dropdown [data-selectable] .highlight {
+    background: color-mix(in oklch, var(--primary) 25%, transparent);
+}
+
+:root .ts-dropdown .spinner::after {
+    border-color: var(--muted-foreground) transparent;
+}

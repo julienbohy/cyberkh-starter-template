@@ -1,0 +1,5 @@
+# The texts of Tom Select in the autocomplete fields: ux-autocomplete translates its options in this domain.
+autocomplete:
+    no_results: Aucun résultat
+    no_more_results: Plus aucun résultat
+    loading_more: Chargement de plus de résultats...
