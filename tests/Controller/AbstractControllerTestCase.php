@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Controller;
 
+use App\Tests\RealTime\HubSpy;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\Mime\Email;
@@ -24,6 +25,8 @@ abstract class AbstractControllerTestCase extends WebTestCase
     protected function setUp(): void
     {
         $this->client = static::createClient();
+        // The recorded updates are static: they would leak from one test into the next.
+        HubSpy::reset();
     }
 
     /**

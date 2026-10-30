@@ -1,7 +1,7 @@
 # The production: the prod image, which holds the code, the dependencies and the assets.
 #   docker compose -f compose.yaml -f compose.prod.yaml up --detach --wait --build
 # The migrations run on their own, before the application and the worker start.
-# APP_SECRET, POSTGRES_PASSWORD, SERVER_NAME (your domain), MAILER_DSN and MAILER_FROM come from
+# APP_SECRET, POSTGRES_PASSWORD, MERCURE_JWT_SECRET, SERVER_NAME (your domain), MAILER_DSN and MAILER_FROM come from
 # the environment of the host: Caddy gets the HTTPS certificate of SERVER_NAME on its own.
 
 x-app-prod-environment: &app-prod-environment
@@ -10,6 +10,10 @@ x-app-prod-environment: &app-prod-environment
   MAILER_DSN: ${MAILER_DSN:?MAILER_DSN is required}
   MAILER_FROM: ${MAILER_FROM:?MAILER_FROM is required}
   DEFAULT_URI: https://${SERVER_NAME:-localhost}
+  # Given here: composer dump-env bakes the .env one, built from the development DEFAULT_URI.
+  MERCURE_PUBLIC_URL: https://${SERVER_NAME:-localhost}/.well-known/mercure
+  # Signs the JWTs of the Mercure hub (HS256): at least 32 bytes.
+  MERCURE_JWT_SECRET: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET is required}
   # The uploaded files: in the app_storage volume (local), or on S3.
   STORAGE_ADAPTER: ${STORAGE_ADAPTER:-local}
   S3_BUCKET: ${S3_BUCKET:-app}
@@ -26,6 +30,10 @@ services:
       target: frankenphp_prod
     environment:
       <<: *app-prod-environment
+      # The hub of the Caddyfile, with the required secret and the issuer of the production.
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET is required}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET:?MERCURE_JWT_SECRET is required}
+      MERCURE_TRUSTED_ISSUERS: https://${SERVER_NAME:-localhost}
     volumes:
       - app_storage:/app/var/storage
     ports:

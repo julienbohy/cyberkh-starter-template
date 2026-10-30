@@ -8,6 +8,13 @@ services:
     restart: unless-stopped
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}
+      # The Mercure hub of the Caddyfile (Dockerfile): it checks the JWTs that the app signs with
+      # MERCURE_JWT_SECRET, and only those whose "iss" is the app's URL (config/packages/mercure.yaml).
+      MERCURE_PUBLISHER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_SUBSCRIBER_JWT_KEY: ${MERCURE_JWT_SECRET}
+      MERCURE_PUBLISHER_JWT_ALG: HS256
+      MERCURE_SUBSCRIBER_JWT_ALG: HS256
+      MERCURE_TRUSTED_ISSUERS: ${DEFAULT_URI}
     depends_on:
       database:
         condition: service_healthy

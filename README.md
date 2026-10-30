@@ -19,6 +19,7 @@ or with **Use this template** on GitHub.
 - **Application shell**: collapsible sidebar menu, breadcrumbs and user menu
 - **Files**: VichUploader on Flysystem storages, local or S3 (RustFS in development), with
   LiipImagine thumbnails: the photo of the profile
+- **Real time**: **Mercure**, by the hub built into FrankenPHP, and Turbo refreshes
 - **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
 - **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
 - **PHPUnit**, **Foundry** and **DAMA Doctrine Test Bundle** for the tests
@@ -190,6 +191,26 @@ The menu is in `templates/components/AppShell/Navigation.html.twig`: a feature a
 there, in a group of its own, with the role that can see them. The pages of the visitors (login,
 registration, password reset) extend `layout/auth.html.twig`.
 
+## Real time
+
+The pages update live through Mercure. The hub is the one built into FrankenPHP: the `Dockerfile`
+enables the `mercure` block of the Caddyfile, without `anonymous` (every topic is private) nor
+`subscriptions` (its API would list the subscribers). There is no container for it and no hub URL:
+`symfony/mercure-bundle` publishes in-process, through `mercure_publish()`.
+
+| Variable             | Value                                                                   |
+|----------------------|-------------------------------------------------------------------------|
+| `MERCURE_PUBLIC_URL` | The URL the browsers subscribe to: `${DEFAULT_URI}/.well-known/mercure` |
+| `MERCURE_JWT_SECRET` | Signs the subscriber tokens (HS256, at least 32 bytes)                  |
+
+The tokens carry `iss` = `DEFAULT_URI`, the `MERCURE_TRUSTED_ISSUERS` of the hub: the two must stay
+equal, or the hub rejects every subscriber. The Caddyfile is baked into the image: after a change of
+the `Dockerfile`, `castor stack:start` rebuilds it. The hub answers 401 without a token.
+
+`mercure_publish()` only exists inside a request served by FrankenPHP: an update published from a
+command or from the Messenger worker is logged, and reaches no browser. In the tests,
+`tests/RealTime/HubSpy.php` replaces the hub and records the updates.
+
 ## Quality
 
 `castor qa:lint` runs every static check: the linters of Symfony (container, YAML, Twig), ECS,
@@ -230,6 +251,7 @@ current ones, and keeps the other lines of the file.
 |---------------------------|--------------------------------------------------------------------|
 | `SERVER_NAME`             | The domain, e.g. `app.example.com`                                 |
 | `APP_SECRET`              | Generated once: a new one would log out the users                  |
+| `MERCURE_JWT_SECRET`      | Generated once: signs the tokens of the Mercure hub                |
 | `POSTGRES_PASSWORD`       | Generated once: PostgreSQL keeps the password of its first start   |
 | `MAILER_DSN`              | The mailer, e.g. `smtp://user:password@smtp.example.com:587`       |
 | `MAILER_FROM`             | The sender of the emails, e.g. `App <noreply@example.com>`         |
@@ -287,6 +309,10 @@ castor prod:start
 
 `prod:start` builds the image again, runs the new migrations (the `migrations` service, which
 exits once done), then recreates the containers whose image or configuration changed.
+
+A project deployed before the Mercure hub has no `MERCURE_JWT_SECRET`, and `compose.prod.yaml`
+refuses to start without it: run `castor prod:init` once before this update. It keeps the other
+secrets.
 
 ### Operations
 

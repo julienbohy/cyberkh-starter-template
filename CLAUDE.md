@@ -53,6 +53,8 @@ worker keeps old code: `docker compose restart messenger` after changing a messa
 - **Files**: VichUploader on Flysystem; each storage exists as local and S3 variants, picked at
   runtime by `STORAGE_ADAPTER` (`local` in `.env`/tests, `s3` = RustFS in `.env.dev`). Private files
   are served through a controller (see `AvatarController`), thumbnails via LiipImagine.
+- **Real time**: the Mercure hub is built into FrankenPHP (`Dockerfile`), and publishing only works
+  inside a request it serves. Tests assert with `tests/RealTime/HubSpy.php`.
 - **Async**: emails go through the Doctrine `async` Messenger transport.
 - **Entities** use UUID ids (routes use `Requirement::UUID`).
 
