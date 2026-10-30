@@ -31,23 +31,24 @@ services:
       storage-init:
         condition: service_completed_successfully
 
-  # Sends the emails queued in the "async" transport. Restarted after an hour, to take the changes
-  # of the code (or now: docker compose restart messenger).
+  # Sends the emails queued in the "async" transport. Relaunched after an hour by its own loop, to
+  # take the changes of the code (or now: docker compose restart messenger). No restart policy in
+  # development: the stack only starts on request, not with Docker.
   messenger:
     <<: *app-dev
-    restart: unless-stopped
     entrypoint: ["docker-php-entrypoint"]
-    command: ["php", "bin/console", "messenger:consume", "async", "--time-limit=3600"]
+    command: ["sh", "-c", "while true; do php bin/console messenger:consume async --time-limit=3600; sleep 1; done"]
     healthcheck:
       disable: true
     depends_on:
       php:
         condition: service_healthy
+      mailer:
+        condition: service_started
 
   # Rebuilds the CSS when a template changes.
   tailwind:
     <<: *app-dev
-    restart: unless-stopped
     entrypoint: ["docker-php-entrypoint"]
     command: ["php", "bin/console", "tailwind:build", "--watch"]
     healthcheck:
