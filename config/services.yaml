@@ -32,3 +32,13 @@ services:
             - '%env(S3_ACCESS_KEY)%'
             - '%env(S3_SECRET_KEY)%'
             - '%env(bool:S3_PATH_STYLE)%'
+
+when@test:
+    services:
+        # Records the published updates (tests/RealTime/HubSpy.php): FrankenPHP's mercure_publish()
+        # does not exist under PHPUnit. Outside the profiler's TraceableHub (priority 0), so that the
+        # hub the app gets is the spy itself.
+        App\Tests\RealTime\HubSpy:
+            decorates: mercure.hub.default
+            decoration_priority: -1
+            arguments: ['@.inner']

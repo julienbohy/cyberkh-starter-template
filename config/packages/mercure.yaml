@@ -1,0 +1,16 @@
+# The Mercure hub built into FrankenPHP (Dockerfile). Without a "url", the bundle publishes
+# in-process through mercure_publish() (FrankenPhpHub): no HTTP call and no publisher JWT.
+mercure:
+    hubs:
+        default:
+            public_url: '%env(MERCURE_PUBLIC_URL)%'
+            # The protocol 1.0 name, also in debug mode: the hub does not run in "playground" mode.
+            cookie_name: '__Secure-mercure_access_token'
+            jwt:
+                secret: '%env(MERCURE_JWT_SECRET)%'
+                # Required by the protocol 1.0 (RFC 9068 access tokens). "iss" must equal the
+                # hub's MERCURE_TRUSTED_ISSUERS (compose.yaml), or the hub rejects the subscribers.
+                claims:
+                    iss: '%env(DEFAULT_URI)%'
+                    sub: 'app'
+                    client_id: 'app'

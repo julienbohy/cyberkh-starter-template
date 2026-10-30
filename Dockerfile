@@ -34,6 +34,17 @@ RUN set -eux; \
 # https://getcomposer.org/doc/03-cli.md#composer-allow-superuser
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
+# The Mercure hub built into FrankenPHP (config/packages/mercure.yaml): the commented-out mercure
+# block of the base image's Caddyfile, uncommented, keyed by the MERCURE_* variables of compose.yaml.
+# Without "anonymous", as every topic is private, nor "subscriptions", whose API would list the
+# subscribers. The "Uncomment..." comment above the block is reworded, as it no longer applies.
+# The greps fail the build if a new base image changes the block (an "if", as "set -e" ignores "!").
+RUN set -eux; \
+    sed -i -e '/^\t#mercure {$/,/^\t#}$/{/anonymous\|subscriptions\|Allow anonymous subscribers\|Enable the subscription API/d;s/^\t#/\t/}' \
+        -e 's/^\t# Uncomment the following lines to enable Mercure and Vulcain modules$/\t# Mercure hub, enabled by the Dockerfile (Vulcain stays off)/' /etc/frankenphp/Caddyfile; \
+    grep -qP '^\tmercure \{' /etc/frankenphp/Caddyfile; \
+    if grep -qP '^\t\t(anonymous|subscriptions)' /etc/frankenphp/Caddyfile; then exit 1; fi
+
 COPY --link frankenphp/conf.d/10-app.ini $PHP_INI_DIR/conf.d/
 COPY --link --chmod=755 frankenphp/docker-entrypoint.sh /usr/local/bin/docker-entrypoint
 

@@ -19,6 +19,11 @@ parameters:
         -
             identifier: symplify.requireAttributeNamespace
             path: src/Validator/*
+        # The hub of the test env, wired in config/services.yaml under when@test, which the dev
+        # container read by PHPStan does not hold; its static API serves the tests.
+        -
+            identifier: shipmonk.deadMethod
+            path: tests/RealTime/HubSpy.php
     symfony:
         containerXmlPath: var/cache/dev/App_KernelDevDebugContainer.xml
     doctrine:

@@ -33,6 +33,7 @@ function init(): void
         // Generated once: a new one would log out the users, or lose the database.
         'APP_SECRET' => $values['APP_SECRET'] ?? bin2hex(random_bytes(16)),
         'POSTGRES_PASSWORD' => $values['POSTGRES_PASSWORD'] ?? bin2hex(random_bytes(16)),
+        'MERCURE_JWT_SECRET' => $values['MERCURE_JWT_SECRET'] ?? bin2hex(random_bytes(32)),
         'MAILER_DSN' => ask('Mailer DSN (e.g. smtp://user:password@smtp.example.com:587)', $values['MAILER_DSN'] ?? null),
         'MAILER_FROM' => ask('Sender of the emails', $values['MAILER_FROM'] ?? null),
         'CLOUDFLARE_TUNNEL_TOKEN' => '',
