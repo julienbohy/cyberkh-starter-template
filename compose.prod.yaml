@@ -7,6 +7,7 @@
 x-app-prod-environment: &app-prod-environment
   APP_SECRET: ${APP_SECRET:?APP_SECRET is required}
   DATABASE_URL: postgresql://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-app}?serverVersion=${POSTGRES_VERSION:-18}&charset=utf8
+  LOCK_DSN: postgresql+advisory://${POSTGRES_USER:-app}:${POSTGRES_PASSWORD:?POSTGRES_PASSWORD is required}@database:5432/${POSTGRES_DB:-app}
   MAILER_DSN: ${MAILER_DSN:?MAILER_DSN is required}
   MAILER_FROM: ${MAILER_FROM:?MAILER_FROM is required}
   DEFAULT_URI: https://${SERVER_NAME:-localhost}
