@@ -6,6 +6,17 @@
         <nav class="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
             <a href="{{ path('app_login') }}" class="font-semibold">{{ 'app.name'|trans }}</a>
             <div class="flex items-center gap-2">
+                <twig:DropdownMenu id="preference-menu" align="end">
+                    <twig:DropdownMenu:Trigger>
+                        <twig:Button variant="ghost" size="sm" :aria-label="'preference.menu'|trans" {{ ...dropdown_menu_trigger_attrs }}>
+                            <twig:ux:icon name="lucide:languages" aria-hidden="true" />
+                            <span class="uppercase">{{ app.request.locale }}</span>
+                        </twig:Button>
+                    </twig:DropdownMenu:Trigger>
+                    <twig:DropdownMenu:Content class="w-56">
+                        {{ include('layout/_preference_items.html.twig') }}
+                    </twig:DropdownMenu:Content>
+                </twig:DropdownMenu>
                 <twig:Button as="a" href="{{ path('app_login') }}" variant="ghost" size="sm">{{ 'nav.login'|trans }}</twig:Button>
                 {% if registration_enabled %}
                     <twig:Button as="a" href="{{ path('app_register') }}" size="sm">{{ 'nav.register'|trans }}</twig:Button>

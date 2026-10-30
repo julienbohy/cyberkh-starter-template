@@ -29,9 +29,10 @@ abstract class AbstractControllerTestCase extends WebTestCase
     /**
      * @param array<string, string> $parameters
      */
-    protected function trans(string $id, array $parameters = [], string $domain = 'messages'): string
+    protected function trans(string $id, array $parameters = [], string $domain = 'messages', string $locale = 'en'): string
     {
-        return static::getContainer()->get(TranslatorInterface::class)->trans($id, $parameters, $domain);
+        // Explicit: a request switches the locale of the translator, and it stays switched after it.
+        return static::getContainer()->get(TranslatorInterface::class)->trans($id, $parameters, $domain, $locale);
     }
 
     protected function logIn(string $email, string $password): void

@@ -8,7 +8,9 @@
     ## 'default'|'destructive' The visual style variant.
     variant = 'default',
     ## boolean Whether selecting the item closes the menu.
-    closeOnSelect = true
+    closeOnSelect = true,
+    ## 'button'|'submit' The type of a button item; submit sends the form it belongs to.
+    type = 'button'
 -%}
 {%- set style = html_cva(
     base: 'group/dropdown-menu-item relative flex w-full cursor-default select-none items-center gap-1.5 rounded-md px-1.5 py-1 text-sm outline-hidden transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground data-[disabled=true]:pointer-events-none data-[disabled=true]:opacity-50 [&_svg:not([class*=size-])]:size-4 [&_svg]:pointer-events-none [&_svg]:shrink-0',
@@ -31,7 +33,7 @@
     data-close-on-select="{{ closeOnSelect ? 'true' : 'false' }}"
     data-disabled="{{ disabled ? 'true' : 'false' }}"
     aria-disabled="{{ disabled ? 'true' : 'false' }}"
-    {% if as == 'button' %}type="button"{% endif %}
+    {% if as == 'button' %}type="{{ type }}"{% endif %}
     {%- if as == 'button' and disabled %} disabled{% endif %}
     {{ attributes.defaults({
         class: style.apply({variant: variant, inset: inset ? 'true' : 'false'})|tailwind_classes,

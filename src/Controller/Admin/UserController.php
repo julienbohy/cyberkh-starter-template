@@ -7,6 +7,7 @@ namespace App\Controller\Admin;
 use App\Entity\User;
 use App\Form\Admin\InvitationType;
 use App\Form\Admin\UserType;
+use App\Preference\Language;
 use App\Repository\UserRepository;
 use App\Security\PasswordLinkMailer;
 use App\Security\Role;
@@ -55,6 +56,8 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             // No password: the invited user chooses it from the link, which verifies their email too.
+            // Their language starts as the one of the admin who invites them; they can change it.
+            $user->setLanguage(Language::from($request->getLocale()));
             $this->entityManager->persist($user);
             $this->entityManager->flush();
             $this->passwordLinkMailer->sendInvitation($user);

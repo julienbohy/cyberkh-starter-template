@@ -14,8 +14,8 @@ or with **Use this template** on GitHub.
 - **PHP 8.5** and **Symfony 8.1**, served by **FrankenPHP** (Caddy, HTTPS), in Docker
 - **Doctrine ORM** with migrations, on **PostgreSQL 18**
 - **Messenger** (Doctrine transport), **Mailer**, **Notifier**
-- **Users**: login, registration with email verification, password reset, and their
-  management by the super admins
+- **Users**: login, registration with email verification, password reset, a language and a theme,
+  and their management by the super admins
 - **Application shell**: collapsible sidebar menu, breadcrumbs and user menu
 - **Files**: VichUploader on Flysystem storages, local or S3 (RustFS in development), with
   LiipImagine thumbnails: the photo of the profile
@@ -116,8 +116,16 @@ development land in Mailpit, at http://localhost:8025.
 - The registration is turned off with `APP_REGISTRATION_ENABLED=0`: `/register` answers 404
   and its links disappear. The verification links already sent keep working.
 - The emails are sent from `MAILER_FROM`, through the `async` Messenger transport.
-- The pages are translated in French (the default locale) and in English (`translations/`).
+- The pages are translated in English (the default locale) and in French (`translations/`).
 - The forms are rendered with the shadcn components (`templates/form/shadcn_layout.html.twig`).
+
+### Language and theme
+
+Each user chooses their language and theme (light, dark, or the one of the device) from the user
+menu; the visitors choose them from the header of the login pages, in cookies. The language comes
+from the account, else the cookie, else the browser, else English. To add a language: a case in
+`App\Preference\Language`, `enabled_locales` in `config/packages/translation.yaml`, and its
+`translations/` files.
 
 ### Profile
 

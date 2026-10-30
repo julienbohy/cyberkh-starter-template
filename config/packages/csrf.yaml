@@ -9,3 +9,5 @@ framework:
             - submit
             - authenticate
             - logout
+            # The language and theme switches, also used by visitors, who have no session.
+            - preference

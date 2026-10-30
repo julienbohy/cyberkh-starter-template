@@ -1,0 +1,30 @@
+{#- The language and theme choices, as menu items: each item submits its own small form.
+    `_target` brings the user back to the page they were on. Turbo is off, so the whole page,
+    <html> included, is drawn again in the new language and theme. -#}
+{%- set _target = app.request.requestUri -%}
+<twig:DropdownMenu:Label>{{ 'preference.language'|trans }}</twig:DropdownMenu:Label>
+{% for language in languages() %}
+    <form method="post" action="{{ path('app_preference_language') }}" data-turbo="false">
+        <input type="hidden" name="_token" data-controller="csrf-protection" value="{{ csrf_token('preference') }}">
+        <input type="hidden" name="_target" value="{{ _target }}">
+        <twig:DropdownMenu:Item type="submit" name="language" value="{{ language.value }}" lang="{{ language.value }}" aria-current="{{ app.request.locale == language.value ? 'true' : 'false' }}">
+            <twig:ux:icon name="lucide:languages" aria-hidden="true" />
+            <span class="flex-1">{{ language.nativeName }}</span>
+            {% if app.request.locale == language.value %}<twig:ux:icon name="lucide:check" aria-hidden="true" />{% endif %}
+        </twig:DropdownMenu:Item>
+    </form>
+{% endfor %}
+<twig:DropdownMenu:Separator />
+<twig:DropdownMenu:Label>{{ 'preference.theme.label'|trans }}</twig:DropdownMenu:Label>
+{% set _current_theme = current_theme() %}
+{% for theme in themes() %}
+    <form method="post" action="{{ path('app_preference_theme') }}" data-turbo="false">
+        <input type="hidden" name="_token" data-controller="csrf-protection" value="{{ csrf_token('preference') }}">
+        <input type="hidden" name="_target" value="{{ _target }}">
+        <twig:DropdownMenu:Item type="submit" name="theme" value="{{ theme.value }}" aria-current="{{ _current_theme == theme ? 'true' : 'false' }}">
+            <twig:ux:icon name="{{ {light: 'lucide:sun', dark: 'lucide:moon', system: 'lucide:monitor'}[theme.value] }}" aria-hidden="true" />
+            <span class="flex-1">{{ ('preference.theme.' ~ theme.value)|trans }}</span>
+            {% if _current_theme == theme %}<twig:ux:icon name="lucide:check" aria-hidden="true" />{% endif %}
+        </twig:DropdownMenu:Item>
+    </form>
+{% endfor %}

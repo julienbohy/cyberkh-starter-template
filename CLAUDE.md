@@ -40,9 +40,12 @@ worker keeps old code: `docker compose restart messenger` after changing a messa
 - **UI components**: `templates/components/` holds the shadcn UX Toolkit components (Button,
   Card, Table, Dialog, Sidebar...); reuse them. Forms render through
   `templates/form/shadcn_layout.html.twig`.
-- **Translations**: `translations/*.{en,fr}.yaml`. Templates, flashes and form labels use
+- **Translations**: default locale `en`, also `fr` (`translations/*.{en,fr}.yaml`). Templates, flashes and form labels use
   translation keys (e.g. `admin.user.flash.invited`); add keys to both languages. Functional tests
-  assert on translation keys via `$this->trans()`, not raw text.
+  assert on translation keys via `$this->trans()` (English unless given a `locale`), not raw text.
+- **Language and theme**: `User::$language` (`App\Preference\Language`) and `User::$theme`
+  (`Theme`), switched from the user menu or, for visitors, the auth header (cookies).
+  `LanguageSubscriber` picks account, cookie, browser, then English.
 - **Files**: VichUploader on Flysystem; each storage exists as local and S3 variants, picked at
   runtime by `STORAGE_ADAPTER` (`local` in `.env`/tests, `s3` = RustFS in `.env.dev`). Private files
   are served through a controller (see `AvatarController`), thumbnails via LiipImagine.
