@@ -46,6 +46,10 @@ worker keeps old code: `docker compose restart messenger` after changing a messa
 - **Language and theme**: `User::$language` (`App\Preference\Language`) and `User::$theme`
   (`Theme`), switched from the user menu or, for visitors, the auth header (cookies).
   `LanguageSubscriber` picks account, cookie, browser, then English.
+- **Emails**: templates extend `email/layout.html.twig` (styles in `email/email.css`, inlined at
+  sending) and render their main link with `email/_button.html.twig`. They start with
+  `RecipientEmails::create()`, to go out in the language of the recipient. The text version is
+  generated from the HTML.
 - **Files**: VichUploader on Flysystem; each storage exists as local and S3 variants, picked at
   runtime by `STORAGE_ADAPTER` (`local` in `.env`/tests, `s3` = RustFS in `.env.dev`). Private files
   are served through a controller (see `AvatarController`), thumbnails via LiipImagine.

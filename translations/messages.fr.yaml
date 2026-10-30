@@ -28,6 +28,7 @@ pagination:
     next: Suivant
 
 email:
+    tagline: Vous recevez cet email en raison de votre compte.
     link_expires: 'Ce lien expire dans %delay%.'
 
 login:

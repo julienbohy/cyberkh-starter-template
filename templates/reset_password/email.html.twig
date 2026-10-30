@@ -1,9 +1,13 @@
-<h1>{{ 'reset_password.email.heading'|trans }}</h1>
+{% extends 'email/layout.html.twig' %}
 
-<p>{{ 'reset_password.email.intro'|trans }}</p>
+{% block body %}
+    <h1>{{ 'reset_password.email.heading'|trans }}</h1>
 
-<p><a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ 'reset_password.email.link'|trans }}</a></p>
+    <p>{{ 'reset_password.email.intro'|trans }}</p>
 
-<p>{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>
+    {{ include('email/_button.html.twig', {href: url('app_reset_password', {token: resetToken.token}), label: 'reset_password.email.link'|trans}) }}
 
-<p>{{ 'reset_password.email.ignore'|trans }}</p>
+    <p class="note">{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>
+
+    <p class="note">{{ 'reset_password.email.ignore'|trans }}</p>
+{% endblock %}

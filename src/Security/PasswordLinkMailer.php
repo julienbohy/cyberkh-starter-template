@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace App\Security;
 
 use App\Entity\User;
+use App\Mailer\RecipientEmails;
 use App\Repository\ResetPasswordRequestRepository;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\Mailer\MailerInterface;
-use Symfony\Contracts\Translation\TranslatorInterface;
 use SymfonyCasts\Bundle\ResetPassword\Exception\ResetPasswordExceptionInterface;
 use SymfonyCasts\Bundle\ResetPassword\Model\ResetPasswordToken;
 use SymfonyCasts\Bundle\ResetPassword\ResetPasswordHelper;
@@ -31,7 +30,7 @@ final readonly class PasswordLinkMailer
         private ResetPasswordHelper $resetPasswordHelper,
         private ResetPasswordRequestRepository $resetPasswordRequestRepository,
         private MailerInterface $mailer,
-        private TranslatorInterface $translator,
+        private RecipientEmails $emails,
     ) {}
 
     /**
@@ -58,9 +57,7 @@ final readonly class PasswordLinkMailer
     private function send(User $user, ResetPasswordToken $token, string $subject, string $template): void
     {
         $this->mailer->send(
-            new TemplatedEmail()
-                ->to($user->getEmail())
-                ->subject($this->translator->trans($subject))
+            $this->emails->create($user, $subject)
                 ->htmlTemplate($template)
                 ->context([
                     'resetToken' => $token,

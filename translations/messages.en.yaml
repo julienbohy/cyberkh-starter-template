@@ -28,6 +28,7 @@ pagination:
     next: Next
 
 email:
+    tagline: You are receiving this email because of your account.
     link_expires: 'This link expires in %delay%.'
 
 login:

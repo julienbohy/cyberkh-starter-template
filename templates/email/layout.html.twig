@@ -1,0 +1,34 @@
+{# Clients mail ignore most of CSS: tables for the structure, and every style inlined at sending. #}
+{% apply inline_css(source('email/email.css')) %}
+<!doctype html>
+<html lang="{{ app.locale }}">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ email.subject }}</title>
+</head>
+<body>
+    <table role="presentation" class="page" width="100%" cellpadding="0" cellspacing="0" bgcolor="#f0f9f9">
+        <tr>
+            <td align="center" class="page-cell">
+                <!--[if mso]><table role="presentation" width="600" cellpadding="0" cellspacing="0"><tr><td><![endif]-->
+                <table role="presentation" class="container" width="100%" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td class="brand">{{ 'app.name'|trans }}</td>
+                    </tr>
+                    <tr>
+                        <td class="card" bgcolor="#ffffff">
+                            {% block body %}{% endblock %}
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class="footer"><p class="tagline">{{ 'email.tagline'|trans }}</p></td>
+                    </tr>
+                </table>
+                <!--[if mso]></td></tr></table><![endif]-->
+            </td>
+        </tr>
+    </table>
+</body>
+</html>
+{% endapply %}
