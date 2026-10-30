@@ -1,0 +1,13 @@
+{# The color is also an attribute, and the padding is on the cell: Outlook ignores them on a link. #}
+{# The space around it is padding too: margins on a table are not reliable. #}
+<table role="presentation" cellpadding="0" cellspacing="0">
+    <tr>
+        <td class="button-spacing">
+            <table role="presentation" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="button-cell" bgcolor="#007275"><a class="button" href="{{ href }}">{{ label }}</a></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+</table>

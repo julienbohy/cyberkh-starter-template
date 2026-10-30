@@ -1,7 +1,11 @@
-<h1>{{ 'admin.user.invitation_email.heading'|trans({'%app%': 'app.name'|trans}) }}</h1>
+{% extends 'email/layout.html.twig' %}
 
-<p>{{ 'admin.user.invitation_email.intro'|trans }}</p>
+{% block body %}
+    <h1>{{ 'admin.user.invitation_email.heading'|trans({'%app%': 'app.name'|trans}) }}</h1>
 
-<p><a href="{{ url('app_reset_password', {token: resetToken.token}) }}">{{ 'admin.user.invitation_email.link'|trans }}</a></p>
+    <p>{{ 'admin.user.invitation_email.intro'|trans }}</p>
 
-<p>{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>
+    {{ include('email/_button.html.twig', {href: url('app_reset_password', {token: resetToken.token}), label: 'admin.user.invitation_email.link'|trans}) }}
+
+    <p class="note">{{ 'email.link_expires'|trans({'%delay%': resetToken.expirationMessageKey|trans(resetToken.expirationMessageData, 'ResetPasswordBundle')}) }}</p>
+{% endblock %}

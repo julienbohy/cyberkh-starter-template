@@ -6,4 +6,6 @@ twig:
 
 when@test:
     twig:
+        paths:
+            '%kernel.project_dir%/tests/templates': ~
         strict_variables: true

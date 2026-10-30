@@ -1,7 +1,11 @@
-<h1>{{ 'registration.email.heading'|trans }}</h1>
+{% extends 'email/layout.html.twig' %}
 
-<p>{{ 'registration.email.intro'|trans }}</p>
+{% block body %}
+    <h1>{{ 'registration.email.heading'|trans }}</h1>
 
-<p><a href="{{ signedUrl|raw }}">{{ 'registration.email.link'|trans }}</a></p>
+    <p>{{ 'registration.email.intro'|trans }}</p>
 
-<p>{{ 'email.link_expires'|trans({'%delay%': expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle')}) }}</p>
+    {{ include('email/_button.html.twig', {href: signedUrl|raw, label: 'registration.email.link'|trans}) }}
+
+    <p class="note">{{ 'email.link_expires'|trans({'%delay%': expiresAtMessageKey|trans(expiresAtMessageData, 'VerifyEmailBundle')}) }}</p>
+{% endblock %}

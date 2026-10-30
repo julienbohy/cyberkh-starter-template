@@ -6,10 +6,11 @@ namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\RegistrationFormType;
+use App\Mailer\RecipientEmails;
+use App\Preference\Language;
 use App\Repository\UserRepository;
 use App\Security\EmailVerifier;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Bridge\Twig\Mime\TemplatedEmail;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\HttpFoundation\Request;
@@ -25,6 +26,7 @@ final class RegistrationController extends AbstractController
     public function __construct(
         private readonly EmailVerifier $emailVerifier,
         private readonly TranslatorInterface $translator,
+        private readonly RecipientEmails $emails,
     ) {}
 
     #[Route(path: '/register', name: 'app_register')]
@@ -48,6 +50,8 @@ final class RegistrationController extends AbstractController
             $plainPassword = $form->get('plainPassword')->getData();
 
             $user->setPassword($userPasswordHasher->hashPassword($user, $plainPassword));
+            // The language of the page they signed up on: their emails start in it.
+            $user->setLanguage(Language::from($request->getLocale()));
 
             $entityManager->persist($user);
             $entityManager->flush();
@@ -55,9 +59,7 @@ final class RegistrationController extends AbstractController
             $this->emailVerifier->sendEmailConfirmation(
                 'app_verify_email',
                 $user,
-                new TemplatedEmail()
-                    ->to($user->getEmail())
-                    ->subject($this->translator->trans('registration.email.subject'))
+                $this->emails->create($user, 'registration.email.subject')
                     ->htmlTemplate('registration/confirmation_email.html.twig'),
             );
 

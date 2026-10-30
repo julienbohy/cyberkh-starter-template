@@ -116,6 +116,11 @@ development land in Mailpit, at http://localhost:8025.
 - The registration is turned off with `APP_REGISTRATION_ENABLED=0`: `/register` answers 404
   and its links disappear. The verification links already sent keep working.
 - The emails are sent from `MAILER_FROM`, through the `async` Messenger transport.
+- A new email starts with `App\Mailer\RecipientEmails::create()`, so it goes out in the language of
+  its recipient, not of the sender. Its template extends `email/layout.html.twig` (styles in
+  `email/email.css`, inlined at sending) and renders its main link with `email/_button.html.twig`.
+  The text version is generated from the HTML. The colors of `email.css` are hex copies of the
+  light theme: change them with the theme.
 - The pages are translated in English (the default locale) and in French (`translations/`).
 - The forms are rendered with the shadcn components (`templates/form/shadcn_layout.html.twig`).
 
