@@ -2,6 +2,8 @@
 
 namespace App\Entity;
 
+use App\Preference\Language;
+use App\Preference\Theme;
 use App\Repository\UserRepository;
 use App\Security\Role;
 use Doctrine\ORM\Mapping as ORM;
@@ -86,9 +88,46 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, Equatab
     #[ORM\Column(nullable: true)]
     private ?\DateTimeImmutable $updatedAt = null;
 
+    /**
+     * The language of the interface and of the emails sent to this user.
+     */
+    #[ORM\Column(length: 5, enumType: Language::class, options: [
+        'default' => 'en',
+    ])]
+    private Language $language = Language::English;
+
+    #[ORM\Column(length: 10, enumType: Theme::class, options: [
+        'default' => 'system',
+    ])]
+    private Theme $theme = Theme::System;
+
     public function __construct()
     {
         $this->createdAt = new \DateTimeImmutable();
+    }
+
+    public function getLanguage(): Language
+    {
+        return $this->language;
+    }
+
+    public function setLanguage(Language $language): static
+    {
+        $this->language = $language;
+
+        return $this;
+    }
+
+    public function getTheme(): Theme
+    {
+        return $this->theme;
+    }
+
+    public function setTheme(Theme $theme): static
+    {
+        $this->theme = $theme;
+
+        return $this;
     }
 
     public function getId(): ?Uuid

@@ -162,3 +162,12 @@ profile:
         avatar_saved: Your photo was saved.
         avatar_deleted: Your photo was deleted.
         password_changed: Your password was changed.
+
+preference:
+    menu: Language and theme
+    language: Language
+    theme:
+        label: Theme
+        light: Light
+        dark: Dark
+        system: System

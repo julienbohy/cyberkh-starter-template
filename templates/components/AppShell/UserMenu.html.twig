@@ -20,6 +20,9 @@
                 {{ 'nav.exit_impersonation'|trans }}
             </twig:DropdownMenu:Item>
         {% endif %}
+        <twig:DropdownMenu:Separator />
+        {{ include('layout/_preference_items.html.twig') }}
+        <twig:DropdownMenu:Separator />
         <twig:DropdownMenu:Item as="a" href="{{ logout_path() }}">
             <twig:ux:icon name="lucide:log-out" aria-hidden="true" />
             {{ 'nav.logout'|trans }}
