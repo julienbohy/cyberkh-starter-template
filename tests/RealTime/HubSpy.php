@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace App\Tests\RealTime;
 
-use Symfony\Component\Mercure\Exception\RuntimeException;
 use Symfony\Component\Mercure\HubInterface;
 use Symfony\Component\Mercure\Jwt\TokenFactoryInterface;
 use Symfony\Component\Mercure\ProtocolVersion;
@@ -58,7 +57,8 @@ final class HubSpy implements HubInterface
         if (self::$failNextPublish) {
             self::$failNextPublish = false;
 
-            throw new RuntimeException('The hub is unreachable (HubSpy::failNextPublish()).');
+            // A plain one, as what mercure_publish() throws is not the exception of the Mercure component.
+            throw new \RuntimeException('The hub is unreachable (HubSpy::failNextPublish()).');
         }
 
         self::$updates[] = $update;

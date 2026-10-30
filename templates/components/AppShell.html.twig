@@ -3,7 +3,9 @@
     ## list<array{label: string, url?: string}> The breadcrumbs after the dashboard; the last item is the current page.
     breadcrumbs = [],
     ## boolean Whether the sidebar is expanded.
-    open = true
+    open = true,
+    ## list<string> The live topics of the page (LiveTopic values).
+    live = []
 -%}
 {#- Captured here, at the top level, where `content` is the block of the host page. -#}
 {%- set _shell_content -%}
@@ -19,6 +21,7 @@
         </twig:Sidebar:Header>
         <twig:Sidebar:Content>
             <twig:AppShell:Navigation />
+            <twig:LiveStream :live="live" />
         </twig:Sidebar:Content>
         <twig:Sidebar:Rail />
     </twig:Sidebar>

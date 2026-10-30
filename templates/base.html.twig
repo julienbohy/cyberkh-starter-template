@@ -25,6 +25,11 @@
             {% block importmap %}{{ importmap('app') }}{% endblock %}
         {% endblock %}
 
+        {#- A live page refreshes in place when its stream says so: morph, keeping the scroll. -#}
+        {% if live|default([]) is not empty %}
+            {{ turbo_refreshes_with(method: 'morph', scroll: 'preserve') }}
+        {% endif %}
+
         {% set frankenphp_hot_reload = app.request.server.get('FRANKENPHP_HOT_RELOAD') %}
         {% if frankenphp_hot_reload %}
         <meta name="frankenphp-hot-reload:url" content="{{ frankenphp_hot_reload }}">

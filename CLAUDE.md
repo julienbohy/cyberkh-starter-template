@@ -54,7 +54,8 @@ worker keeps old code: `docker compose restart messenger` after changing a messa
   runtime by `STORAGE_ADAPTER` (`local` in `.env`/tests, `s3` = RustFS in `.env.dev`). Private files
   are served through a controller (see `AvatarController`), thumbnails via LiipImagine.
 - **Real time**: the Mercure hub is built into FrankenPHP (`Dockerfile`), and publishing only works
-  inside a request it serves. Tests assert with `tests/RealTime/HubSpy.php`.
+  inside a request it serves. Actions call `LiveUpdates::refresh(LiveTopic::X)` after the flush, and a page declares
+  `{% set live = ['...'] %}`. Tests assert with `tests/RealTime/HubSpy.php`.
 - **Async**: emails go through the Doctrine `async` Messenger transport.
 - **Entities** use UUID ids (routes use `Requirement::UUID`).
 

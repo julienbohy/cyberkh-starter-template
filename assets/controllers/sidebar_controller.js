@@ -33,17 +33,15 @@ export default class extends Controller {
     connect() {
         this._mobileQuery = window.matchMedia(`(max-width: ${this.mobileBreakpointValue - 1}px)`);
         this._shortcut = this.keyboardShortcutValue ? this.keyboardShortcutValue.toLowerCase() : '';
-        this._sidebar = this.element.querySelector('[data-slot="sidebar"]');
-        this._desktopSlot = this.element.querySelector('[data-slot="sidebar-inner"]');
-        this._mobileSlot = this.element.querySelector('[data-slot="sidebar-mobile-inner"]');
-        this._mobileDialog = this._mobileSlot?.closest('dialog') ?? null;
+        this._queryParts();
 
         const cookieValue = this._readCookie();
         if (STATE_EXPANDED === cookieValue || STATE_COLLAPSED === cookieValue) {
-            this.element.dataset.state = cookieValue;
+            this._state = cookieValue;
         } else {
-            this.element.dataset.state = this.defaultOpenValue ? STATE_EXPANDED : STATE_COLLAPSED;
+            this._state = this.defaultOpenValue ? STATE_EXPANDED : STATE_COLLAPSED;
         }
+        this.element.dataset.state = this._state;
 
         this._syncPortal();
 
@@ -56,12 +54,23 @@ export default class extends Controller {
         this._onDialogClose = () => this._render();
         this._mobileDialog?.addEventListener('close', this._onDialogClose);
 
+        // A live page morphs back to the server markup: the content returns to the desktop slot
+        // and the state attributes to their defaults, so redo what connect() did. Idempotent.
+        this._onMorph = () => {
+            this._queryParts();
+            this.element.dataset.state = this._state;
+            this._syncPortal();
+            this._render();
+        };
+        document.addEventListener('turbo:morph', this._onMorph);
+
         this._render();
     }
 
     disconnect() {
         this._mobileQuery.removeEventListener('change', this._onMediaChange);
         this._mobileDialog?.removeEventListener('close', this._onDialogClose);
+        document.removeEventListener('turbo:morph', this._onMorph);
     }
 
     toggle(event) {
@@ -118,8 +127,22 @@ export default class extends Controller {
         if (this.element.dataset.state === state) {
             return;
         }
+        this._state = state;
         this.element.dataset.state = state;
         this._writeCookie(state);
+    }
+
+    _queryParts() {
+        const previousDialog = this._mobileDialog;
+        this._sidebar = this.element.querySelector('[data-slot="sidebar"]');
+        this._desktopSlot = this.element.querySelector('[data-slot="sidebar-inner"]');
+        this._mobileSlot = this.element.querySelector('[data-slot="sidebar-mobile-inner"]');
+        this._mobileDialog = this._mobileSlot?.closest('dialog') ?? null;
+        // Should a morph ever swap the <dialog>, move the close listener along.
+        if (this._onDialogClose && previousDialog !== this._mobileDialog) {
+            previousDialog?.removeEventListener('close', this._onDialogClose);
+            this._mobileDialog?.addEventListener('close', this._onDialogClose);
+        }
     }
 
     _isMobile() {

@@ -1,0 +1,7 @@
+{#- The private stream of the page: it subscribes to the page's topics, and rendering it sets the
+    subscriber cookie for every topic the user may follow (see LiveStream). Rendered by hand, like
+    turbo_stream_from(private: true), because that helper grants only what it subscribes to. -#}
+{%- set topics = this.topics -%}
+{% if topics is not empty %}
+    <turbo-mercure-stream-source src="{{ mercure(topics, {subscribe: this.grants}) }}" private></turbo-mercure-stream-source>
+{% endif %}

@@ -8,6 +8,8 @@ use App\Entity\User;
 use App\Form\Admin\InvitationType;
 use App\Form\Admin\UserType;
 use App\Preference\Language;
+use App\RealTime\LiveTopic;
+use App\RealTime\LiveUpdates;
 use App\Repository\UserRepository;
 use App\Security\PasswordLinkMailer;
 use App\Security\Role;
@@ -31,6 +33,7 @@ final class UserController extends AbstractController
     public function __construct(
         private readonly EntityManagerInterface $entityManager,
         private readonly PasswordLinkMailer $passwordLinkMailer,
+        private readonly LiveUpdates $liveUpdates,
     ) {}
 
     #[Route(path: '/admin/users', name: 'admin_user_index', methods: ['GET'])]
@@ -60,6 +63,7 @@ final class UserController extends AbstractController
             $user->setLanguage(Language::from($request->getLocale()));
             $this->entityManager->persist($user);
             $this->entityManager->flush();
+            $this->liveUpdates->refresh(LiveTopic::Users);
             $this->passwordLinkMailer->sendInvitation($user);
 
             $this->addFlash('success', 'admin.user.flash.invited');
@@ -86,6 +90,7 @@ final class UserController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $this->entityManager->flush();
+            $this->liveUpdates->refresh(LiveTopic::Users);
             $this->addFlash('success', 'admin.user.flash.saved');
 
             return $this->redirectToRoute('admin_user_edit', [
@@ -126,6 +131,7 @@ final class UserController extends AbstractController
 
         $this->entityManager->remove($user);
         $this->entityManager->flush();
+        $this->liveUpdates->refresh(LiveTopic::Users);
         $this->addFlash('success', 'admin.user.flash.deleted');
 
         return $this->redirectToRoute('admin_user_index');
