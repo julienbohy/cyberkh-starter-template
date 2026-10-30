@@ -223,6 +223,21 @@ attributes on connect must redo it on `turbo:morph`, as `sidebar_controller.js` 
 must survive the refreshes is `data-turbo-permanent` with a stable id and the `permanent-form`
 controller, which releases it on its own submit so that the result shows.
 
+## Stimulus controllers and autocomplete
+
+The `clipboard` controller copies an input: `data-controller="clipboard"` on a wrapper,
+`data-clipboard-target="source"` on the input, `data-action="clipboard#copy"` on the button, and
+optionally `data-clipboard-target="done"` on a hidden confirmation.
+
+`symfony/ux-autocomplete` and Tom Select are installed, themed in `assets/styles/app.css`, and their
+texts are in `translations/AutocompleteBundle.*`. The global `/autocomplete/{alias}` route is left
+out on purpose, as it is outside the access checks of the pages (`NoGlobalAutocompleteRouteTest`):
+a field is a `TextType` with `autocomplete: true` and an `autocomplete_url` to a route of your own,
+protected like its page, which answers `{"results": [{"value": ..., "text": ...}]}`. A `ChoiceType`
+without choices would refuse the picked value: with a `TextType`, the form receives the value, and
+the controller looks it up and checks it. The options `no_results_found_text`,
+`no_more_results_text` and `loading_more_text` take the keys `autocomplete.*` of this domain.
+
 ## Quality
 
 `castor qa:lint` runs every static check: the linters of Symfony (container, YAML, Twig), ECS,
