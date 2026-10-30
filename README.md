@@ -19,6 +19,8 @@ or with **Use this template** on GitHub.
 - **Application shell**: collapsible sidebar menu, breadcrumbs and user menu
 - **Files**: VichUploader on Flysystem storages, local or S3 (RustFS in development), with
   LiipImagine thumbnails: the photo of the profile
+- **Locks**: `symfony/lock`, on PostgreSQL advisory locks (`LOCK_DSN`)
+- **ObjectMapper**: `symfony/object-mapper`, to map the DTOs of the forms to the entities
 - **Real time**: **Mercure**, by the hub built into FrankenPHP, and Turbo refreshes
 - **Twig**, **AssetMapper**, **Stimulus**, **Turbo**, **Twig and Live Components**, **UX Icons**
 - **Tailwind CSS** with the shadcn kit of the **UX Toolkit**
