@@ -27,3 +27,7 @@ phpstan.neon
 /.twig-cs-fixer.cache
 ###< vincentlanglet/twig-cs-fixer ###
 
+
+###> working documents (specs, plans) ###
+/docs/superpowers/
+###< working documents ###
