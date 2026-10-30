@@ -25,10 +25,14 @@ x-app-prod-environment: &app-prod-environment
   S3_PATH_STYLE: ${S3_PATH_STYLE:-0}
 
 services:
+  database:
+    restart: unless-stopped
+
   php:
     build:
       context: .
       target: frankenphp_prod
+    restart: unless-stopped
     environment:
       <<: *app-prod-environment
       # The hub of the Caddyfile, with the required secret and the issuer of the production.

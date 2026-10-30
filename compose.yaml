@@ -5,7 +5,6 @@ services:
   php:
     build:
       context: .
-    restart: unless-stopped
     environment:
       SERVER_NAME: ${SERVER_NAME:-localhost}
       # The Mercure hub of the Caddyfile (Dockerfile): it checks the JWTs that the app signs with
