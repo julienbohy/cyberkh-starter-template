@@ -211,6 +211,16 @@ the `Dockerfile`, `castor stack:start` rebuilds it. The hub answers 401 without 
 command or from the Messenger worker is logged, and reaches no browser. In the tests,
 `tests/RealTime/HubSpy.php` replaces the hub and records the updates.
 
+To make a page live: add a case to `App\RealTime\LiveTopic`, with the role that can follow it; set
+`{% set live = ['the/topic'] %}` in the page; call `LiveUpdates::refresh()` after the flush of the
+actions that change it. `/admin/users` is the example. The refresh sends no data: each tab fetches
+its own page again, with its own rights.
+
+A live page morphs back to the server markup, so a Stimulus controller that moves DOM or sets
+attributes on connect must redo it on `turbo:morph`, as `sidebar_controller.js` does. A form that
+must survive the refreshes is `data-turbo-permanent` with a stable id and the `permanent-form`
+controller, which releases it on its own submit so that the result shows.
+
 ## Quality
 
 `castor qa:lint` runs every static check: the linters of Symfony (container, YAML, Twig), ECS,

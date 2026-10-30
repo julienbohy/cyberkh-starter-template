@@ -1,6 +1,7 @@
 {% extends 'layout/app.html.twig' %}
 
 {% set breadcrumbs = [{label: 'admin.user.index.title'|trans}] %}
+{% set live = ['admin/users'] %}
 
 {% block title %}{{ 'admin.user.index.title'|trans }} · {{ parent() }}{% endblock %}
 
@@ -14,7 +15,7 @@
             </twig:Button>
         </div>
 
-        <form method="get" role="search" class="flex max-w-md gap-2">
+        <form id="admin-user-search" method="get" role="search" class="flex max-w-md gap-2" data-turbo-permanent data-controller="permanent-form">
             <twig:Input type="search" name="q" value="{{ search }}" :aria-label="'admin.user.index.search'|trans" :placeholder="'admin.user.index.search'|trans" />
             <twig:Button type="submit" variant="outline">{{ 'admin.user.index.search_submit'|trans }}</twig:Button>
         </form>

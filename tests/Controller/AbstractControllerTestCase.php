@@ -68,4 +68,86 @@ abstract class AbstractControllerTestCase extends WebTestCase
 
         return html_entity_decode($matches[1]);
     }
+
+    /**
+     * The topics the Mercure subscriber cookie of the last response grants, flattened from its
+     * protocol 1.0 "authorization_details"; [] without a cookie. Decoded, not verified: the hub
+     * checks the signature, the tests check what the page asked it to grant.
+     *
+     * @return list<string>
+     */
+    protected function mercureGrantedTopics(): array
+    {
+        $jwt = null;
+        foreach ($this->client->getResponse()->headers->getCookies() as $cookie) {
+            if ($cookie->getName() === '__Secure-mercure_access_token') {
+                $jwt = $cookie->getValue();
+            }
+        }
+
+        if ($jwt === null) {
+            return [];
+        }
+
+        $segments = explode('.', $jwt);
+        self::assertCount(3, $segments);
+        $json = base64_decode(strtr($segments[1], '-_', '+/'), true);
+        self::assertIsString($json);
+        $payload = json_decode($json, true, flags: \JSON_THROW_ON_ERROR);
+        self::assertIsArray($payload);
+        $details = $payload['authorization_details'] ?? [];
+        self::assertIsArray($details);
+
+        $topics = [];
+        foreach ($details as $detail) {
+            self::assertIsArray($detail);
+            $actions = $detail['actions'] ?? [];
+            $matchers = $detail['topics'] ?? [];
+            self::assertIsArray($actions);
+            self::assertIsArray($matchers);
+            if (! \in_array('subscribe', $actions, true)) {
+                continue;
+            }
+
+            foreach ($matchers as $matcher) {
+                self::assertIsArray($matcher);
+                self::assertIsString($matcher['match'] ?? null);
+                $topics[] = $matcher['match'];
+            }
+        }
+
+        return $topics;
+    }
+
+    /**
+     * The `match` parameters of the stream source of the last page: what it subscribes to, as opposed
+     * to what the cookie grants.
+     *
+     * @return list<string>
+     */
+    protected function subscribedTopics(): array
+    {
+        $src = (string) $this->client->getCrawler()->filter('turbo-mercure-stream-source[private]')->attr('src');
+        $query = (string) parse_url($src, \PHP_URL_QUERY);
+        $topics = [];
+        foreach (explode('&', $query) as $pair) {
+            if (str_starts_with($pair, 'match=')) {
+                $topics[] = rawurldecode(substr($pair, \strlen('match=')));
+            }
+        }
+
+        return $topics;
+    }
+
+    /**
+     * Exactly one update was published since the start of the test: a private Turbo `refresh` on the topic.
+     */
+    protected function assertOneLiveRefresh(string $topic): void
+    {
+        $updates = HubSpy::updates();
+        self::assertCount(1, $updates);
+        self::assertSame([$topic], $updates[0]->getTopics());
+        self::assertTrue($updates[0]->isPrivate());
+        self::assertStringContainsString('action="refresh"', $updates[0]->getData());
+    }
 }
